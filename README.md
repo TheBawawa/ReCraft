@@ -4,10 +4,10 @@
 
 ## Team members
 
-Ana Paredes 
-Diya Brown
-Rui Wang
-Jessica Williamson
+-- Ana Paredes --
+Diya Brown --
+Rui Wang --
+Jessica Williamson --
 
 TOADD picture of the team
 
@@ -23,7 +23,7 @@ Our app facilitates and enhances the search for DIY (Do it yourself) projects. I
 ## Product Backlog
 [Requirements Discovery](https://docs.google.com/document/d/13EWPcpXU_W9_QlVJDW9c6AQPQC6Q6Fb_xcey6PzoETw/edit?usp=sharing)
 [Product Backlog Validation]()
-[Product Backlog]()
+[Product Backlog](https://docs.google.com/spreadsheets/d/1rRPT84waIOKSS-jNs7svqoX1Bdp5Rm51gihuctjPzRk/edit?usp=sharing)
 
 ## Architecture & Design
 [Architecture & Design]()
