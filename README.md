@@ -1,6 +1,6 @@
 # TEAM TOADD team number
 
-## App name
+## App name: ReCraft
 
 ## Team members
 
