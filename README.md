@@ -21,9 +21,9 @@ Our app facilitates and enhances the search for DIY (Do it yourself) projects. I
 [Calendar](https://calendar.google.com/calendar/u/0?cid=aXZoMmU3NjhzMjRkdGlxZWYwcXZvbzhxcjBAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ)
 
 ## Product Backlog
-[Requirements Discovery](https://docs.google.com/document/d/13EWPcpXU_W9_QlVJDW9c6AQPQC6Q6Fb_xcey6PzoETw/edit?usp=sharing)
-[Product Backlog Validation]()
-[Product Backlog](https://docs.google.com/spreadsheets/d/1rRPT84waIOKSS-jNs7svqoX1Bdp5Rm51gihuctjPzRk/edit?usp=sharing)
+* [Requirements Discovery](https://docs.google.com/document/d/13EWPcpXU_W9_QlVJDW9c6AQPQC6Q6Fb_xcey6PzoETw/edit?usp=sharing)
+* [Product Backlog Validation]()
+* [Product Backlog](https://docs.google.com/spreadsheets/d/1rRPT84waIOKSS-jNs7svqoX1Bdp5Rm51gihuctjPzRk/edit?usp=sharing)
 
 ## Architecture & Design
 [Architecture & Design]()
