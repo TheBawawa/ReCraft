@@ -12,6 +12,9 @@ TOADD picture of the team
 ## Idea Proposal
 [Idea Proposal]()
 
+## Requirements
+[Requirements Discovery](https://docs.google.com/document/d/13EWPcpXU_W9_QlVJDW9c6AQPQC6Q6Fb_xcey6PzoETw/edit?usp=sharing)
+
 ## Calendar
 [Calendar](https://calendar.google.com/calendar/u/0?cid=aXZoMmU3NjhzMjRkdGlxZWYwcXZvbzhxcjBAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ)
 
