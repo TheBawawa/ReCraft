@@ -26,7 +26,7 @@ function App() {
         </p>
       </div>
       <p className="read-the-docs">
-        Ana Paredes, Diya Brown, Rui Wang, Jessica Williamson
+        Ana Paredes -- Diya Brown -- Rui Wang -- Jessica Williamson
       </p>
     </>
   )
