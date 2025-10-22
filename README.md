@@ -9,7 +9,7 @@ Diya Brown --
 Rui Wang --
 Jessica Williamson --
 
-!(team2.png)
+![team02picture](team2.png)
 
 ## App description
 Our app facilitates and enhances the search for DIY (Do it yourself) projects. It takes in a material to search (plastic bottles, cans, cardboard, etc) and gives back a list of vlog style craft that use that material. It also adds the opportunity for the user to upload their own project and share it with the site, adding it to the database.
