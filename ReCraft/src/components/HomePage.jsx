@@ -13,8 +13,9 @@ function HomePage() {
         Ana Paredes — Diya Brown — Rui Wang — Jessica Williamson
       </p>
 
+      {/* Temporal buttons to visualize each work */}
       <button className="circle-btn" onClick={() => navigate("/login")}>
-        TEMPORAL
+        TEMPORAL ANA
       </button>
     </div>
   );
