@@ -26,14 +26,14 @@ Our app facilitates and enhances the search for DIY (Do it yourself) projects. I
 * [Product Backlog](https://docs.google.com/spreadsheets/d/1rRPT84waIOKSS-jNs7svqoX1Bdp5Rm51gihuctjPzRk/edit?usp=sharing)
 
 ## Architecture & Design
-[Architecture & Design]()
+[Architecture & Design](https://www.canva.com/design/DAG2jHi5aRE/G43VvIZ-Dcxx_rBpsG5mmw/edit?utm_content=DAG2jHi5aRE&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
 
 ## Process
 
 ### Sprint 1
 
-* [Sprint planning]()
-* [Scrums]()
+* [Sprint planning](https://docs.google.com/spreadsheets/d/1rRPT84waIOKSS-jNs7svqoX1Bdp5Rm51gihuctjPzRk/edit?gid=1056044682#gid=1056044682)
+* [Scrums](https://docs.google.com/document/d/1tpGb5-cIzuRoG6078RsbcmG2fu5dt1ofmsENnRTBLBo/edit?usp=sharing)
 * [Sprint demo video]()
 * [Sprint retrospective]()
 
