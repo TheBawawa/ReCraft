@@ -7,7 +7,7 @@ function SignupForm() {
       <h2>Sign Up</h2>
       <p>Signup form goes here.</p>
 
-      <Link to="/" className="btn btn-link p-0">
+      <Link to="/Login" className="btn btn-link p-0">
         Back to Login
       </Link>
     </div>
