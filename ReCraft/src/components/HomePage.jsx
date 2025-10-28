@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-{/*import PostTemplate from "../components/PostTemplate"*/}
+//*import PostTemplate from "../components/PostTemplate"
 import "../App.css";
 
 function HomePage() {
@@ -20,7 +20,6 @@ function HomePage() {
       </button>
 
       {/* Your post layout */}
-      <PostTemplate />
     </div>
   );
 }

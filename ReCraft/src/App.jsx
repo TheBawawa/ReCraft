@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Home from "./components/HomePage";
-{/*import About from "./pages/About"*/}
+//import About from "./pages/About"
 import LoginForm from "./components/LoginForm";
 import SignupForm from "./components/SignupForm";
 import "./App.css";
