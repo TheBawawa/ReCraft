@@ -1,9 +1,9 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import PostTemplate from "../components/PostTemplate";
+{/*import PostTemplate from "../components/PostTemplate"*/}
 import "../App.css";
 
-function Home() {
+function HomePage() {
   const navigate = useNavigate();
 
   return (
@@ -14,7 +14,7 @@ function Home() {
         Ana Paredes — Diya Brown — Rui Wang — Jessica Williamson
       </p>
 
-      {/* Temporal button */}
+      {/* Temporal buttons */}
       <button className="circle-btn" onClick={() => navigate("/login")}>
         TEMPORAL ANA
       </button>
@@ -26,7 +26,7 @@ function Home() {
 }
 
 const styles = {
-  page: {
+  homepage: {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
@@ -34,4 +34,4 @@ const styles = {
   },
 };
 
-export default Home;
+export default HomePage;
