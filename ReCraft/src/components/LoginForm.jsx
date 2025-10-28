@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import "../styles/LoginForm.css"
+import { Form, Button, Container, Row, Col } from "react-bootstrap";
+import "../styles/LoginForm.css"; // custom CSS
 
 function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -9,71 +10,61 @@ function LoginForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // For now, just log the data. In real app, send to backend API
-    console.log("Login data:", {email, password});
+    console.log("Login data:", { email, password });
     alert("Login successful! (demo only)");
-    // Reset form
-    setUsername("");
     setEmail("");
     setPassword("");
   };
 
   return (
-    <div className="page-signup container" style={{ maxWidth: "400px" }}>
-      <h2 className="mb-4 text-center">Hello!</h2>
-    
-      <form className="page-login">
-        <div className="email-box">
-          <label htmlFor="inputEmail" className="form-label">
-            Email
-          </label>
-          <input
-            type="email"
-            className="form-control"
-            id="inputEmail"
-            placeholder="Email"
-          />
-        </div>
+    <Container className="login-container">
+      <Row className="justify-content-center">
+        <Col xs={12} sm={10} md={8} lg={6} xl={5}>
+          <h2 className="login-title text-center mb-4">Hello!</h2>
+          <Form onSubmit={handleSubmit} className="login-box">
+            <Form.Group className="mb-3" controlId="email">
+              <Form.Label>Email</Form.Label>
+              <Form.Control
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </Form.Group>
 
-        <div className="mb-3">
-          <label htmlFor="inputPassword" className="form-label">
-            Password
-          </label>
-          <input
-            type={showPassword ? "text" : "password"}
-            className="form-control"
-            id="inputPassword"
-            placeholder="Password"
-          />
-        </div>
+            <Form.Group className="mb-3" controlId="password">
+              <Form.Label>Password</Form.Label>
+              <Form.Control
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </Form.Group>
 
-        <div className="mb-3">
-          <div className="form-check">
-            <input
-              className="form-check-input"
+            <Form.Check
               type="checkbox"
-              id="togglePassword"
+              id="showPassword"
+              label={showPassword ? "Hide password" : "Show password"}
               checked={showPassword}
               onChange={() => setShowPassword(!showPassword)}
+              className="mb-3"
             />
-            <label className="form-check-label" htmlFor="togglePassword">
-              {showPassword ? "Hide password" : "Show password"}
-            </label>
-          </div>
-        </div>
 
-        <div className="text-center">
-          <span>Don’t have an account? </span>
-          <Link to="/signup" className="btn btn-link p-0">
-            Sign up
-          </Link>
-        </div>
+            <div className="text-center mb-3">
+              <span>Don’t have an account? </span>
+              <Link to="/signup" className="signup-link">
+                Sign up
+              </Link>
+            </div>
 
-        <button type="submit" className="btn btn-primary">
-          Sign in
-        </button>
-      </form>
-    </div>
+            <Button type="submit" className="login-button w-100">
+              Log in
+            </Button>
+          </Form>
+        </Col>
+      </Row>
+    </Container>
   );
 }
 
