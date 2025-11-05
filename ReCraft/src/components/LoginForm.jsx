@@ -1,60 +1,142 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { Form, Button, Container, Row, Col, Card, Alert } from "react-bootstrap";
+import { auth } from "../firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!email || !password) {
+      setError("Please fill in all fields");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError("");
+      
+      await signInWithEmailAndPassword(auth, email, password);
+      
+      setEmail("");
+      setPassword("");
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Login error:", error.message);
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <form className="p-4 mx-auto" style={{ maxWidth: "400px" }}>
-      <h2 className="text-center mb-4">Login</h2>
+    <div style={{ 
+      minHeight: "100vh", 
+      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+      display: "flex",
+      alignItems: "center",
+      padding: "20px"
+    }}>
+      <Container>
+        <Row className="justify-content-center">
+          <Col xs={12} sm={10} md={8} lg={5}>
+            <Card className="shadow-lg border-0" style={{ borderRadius: "15px" }}>
+              <Card.Body className="p-5">
+                <div className="text-center mb-4">
+                  <h2 className="fw-bold" style={{ color: "#667eea" }}>Welcome Back</h2>
+                  <p className="text-muted">Log in to your account</p>
+                </div>
+                
+                {error && (
+                  <Alert variant="danger" dismissible onClose={() => setError("")}>
+                    {error}
+                  </Alert>
+                )}
+                
+                <Form onSubmit={handleSubmit}>
+                  <Form.Group className="mb-3" controlId="email">
+                    <Form.Label className="fw-semibold">Email Address</Form.Label>
+                    <Form.Control
+                      type="email"
+                      placeholder="Enter your email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      style={{ 
+                        padding: "12px",
+                        borderRadius: "10px",
+                        border: "2px solid #e0e0e0"
+                      }}
+                    />
+                  </Form.Group>
 
-      <div className="mb-3">
-        <label htmlFor="inputEmail" className="form-label">
-          Email
-        </label>
-        <input
-          type="email"
-          className="form-control"
-          id="inputEmail"
-          placeholder="Enter email"
-        />
-      </div>
+                  <Form.Group className="mb-3" controlId="password">
+                    <Form.Label className="fw-semibold">Password</Form.Label>
+                    <Form.Control
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter your password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      style={{ 
+                        padding: "12px",
+                        borderRadius: "10px",
+                        border: "2px solid #e0e0e0"
+                      }}
+                    />
+                  </Form.Group>
 
-      <div className="mb-3">
-        <label htmlFor="inputPassword" className="form-label">
-          Password
-        </label>
-        <input
-          type={showPassword ? "text" : "password"}
-          className="form-control"
-          id="inputPassword"
-          placeholder="Enter password"
-        />
-      </div>
+                  <Form.Check
+                    type="checkbox"
+                    id="showPassword"
+                    label="Show password"
+                    checked={showPassword}
+                    onChange={() => setShowPassword(!showPassword)}
+                    className="mb-4"
+                  />
 
-      <div className="form-check mb-3">
-        <input
-          className="form-check-input"
-          type="checkbox"
-          id="togglePassword"
-          checked={showPassword}
-          onChange={() => setShowPassword(!showPassword)}
-        />
-        <label className="form-check-label" htmlFor="togglePassword">
-          {showPassword ? "Hide password" : "Show password"}
-        </label>
-      </div>
+                  <Button 
+                    type="submit" 
+                    className="w-100 mb-3 fw-semibold" 
+                    disabled={loading}
+                    style={{
+                      padding: "12px",
+                      borderRadius: "10px",
+                      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                      border: "none",
+                      fontSize: "16px"
+                    }}
+                  >
+                    {loading ? "Logging In..." : "Log In"}
+                  </Button>
 
-      <button type="submit" className="btn btn-primary w-100 mb-2">
-        Sign In
-      </button>
-
-      <div className="text-center">
-        <Link to="/signup" className="btn btn-link p-0">
-          Don’t have an account? Sign Up
-        </Link>
-      </div>
-    </form>
+                  <div className="text-center">
+                    <span className="text-muted">Don't have an account? </span>
+                    <Link 
+                      to="/signup" 
+                      style={{ 
+                        color: "#667eea", 
+                        textDecoration: "none",
+                        fontWeight: "600"
+                      }}
+                    >
+                      Sign Up
+                    </Link>
+                  </div>
+                </Form>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+      </Container>
+    </div>
   );
 }
 
