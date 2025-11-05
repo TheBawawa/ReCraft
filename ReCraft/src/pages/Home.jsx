@@ -7,7 +7,7 @@ function Home() {
   const navigate = useNavigate();
 
   return (
-    <div className="center-content" style={{ minHeight: "80vh" }}>
+    <div className="center-content">
       <h1 style={{ color: "var(--blue-gray)" }}>ReCraft</h1>
       <p style={{ color: "var(--coral)" }}>Team 2</p>
       <p style={{ color: "var(--blue-gray)" }}>

@@ -1,13 +1,13 @@
 function About() {
   return (
     <div className="about-container">
-      <h1 style={{ color: "var(--blue-gray)" }}>About Our Team</h1>
-      <p style={{ color: "var(--coral)" }}>
+      <h1>About Our Team</h1>
+      <p>
         We are Team 2 working on the ReCraft project.
       </p>
 
-      <h3 style={{ color: "var(--aqua)" }}>Team Members:</h3>
-      <ul style={{ listStyle: "none", padding: 0, color: "var(--blue-gray)" }}>
+      <h3>Team Members:</h3>
+      <ul style={{ listStyle: "none", padding: 0 }}>
         <li>Diya Brown</li>
         <li>Jessica Williamson</li>
         <li>Ana Perez</li>
