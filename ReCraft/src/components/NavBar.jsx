@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import ProfileDropdown from "./ProfileDropdown";
+import "bootstrap-icons/font/bootstrap-icons.css";
 
 function Navbar() {
   const [open, setOpen] = useState(false);
@@ -16,12 +17,12 @@ function Navbar() {
         zIndex: 1000,
       }}
     >
-      {/* Left: site name */}
+      {/* Logo */}
       <Link to="/" className="navbar-brand fw-bold text-dark">
         ReCraft
       </Link>
 
-      {/* Center: nav links */}
+      {/* Links */}
       <div className="ms-auto me-3">
         <Link to="/" className="text-dark fw-semibold me-3 text-decoration-none">
           Home
@@ -31,14 +32,14 @@ function Navbar() {
         </Link>
       </div>
 
-      {/* Right: profile icon */}
+      {/* Profile Icon */}
       <div className="position-relative">
         <div
           className="profile-icon"
           onClick={() => setOpen(!open)}
           title="Profile"
         >
-          <i className="bi bi-person-fill"></i>
+          <i className="bi bi-person-fill" style={{ fontSize: "1.5rem", color: "black" }}></i>
         </div>
 
         {open && <ProfileDropdown />}
