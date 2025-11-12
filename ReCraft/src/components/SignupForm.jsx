@@ -46,7 +46,7 @@ function SignupForm() {
   return (
     <div style={{ 
       minHeight: "100vh", 
-      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+      background: "linear-gradient(135deg, #89d957 0%, #1b9aaa 100%)",
       display: "flex",
       alignItems: "center",
       padding: "20px"
@@ -57,7 +57,7 @@ function SignupForm() {
             <Card className="shadow-lg border-0" style={{ borderRadius: "15px" }}>
               <Card.Body className="p-5">
                 <div className="text-center mb-4">
-                  <h2 className="fw-bold" style={{ color: "#667eea" }}>Create Account</h2>
+                  <h2 className="fw-bold" style={{ color: "#1b9aaa" }}>Welcome!</h2>
                   <p className="text-muted">Sign up to get started</p>
                 </div>
                 
@@ -132,7 +132,7 @@ function SignupForm() {
                     style={{
                       padding: "12px",
                       borderRadius: "10px",
-                      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                      background: "linear-gradient(135deg, #89d957 0%, #1b9aaa 100%)",
                       border: "none",
                       fontSize: "16px"
                     }}
@@ -145,7 +145,7 @@ function SignupForm() {
                     <Link 
                       to="/login" 
                       style={{ 
-                        color: "#667eea", 
+                        color: "#1b9aaa", 
                         textDecoration: "none",
                         fontWeight: "600"
                       }}
