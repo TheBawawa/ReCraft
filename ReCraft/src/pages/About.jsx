@@ -10,7 +10,7 @@ function About() {
       <ul style={{ listStyle: "none", padding: 0 }}>
         <li>Diya Brown</li>
         <li>Jessica Williamson</li>
-        <li>Ana Perez</li>
+        <li>Ana Paredes</li>
         <li>Rui Wang</li>
       </ul>
     </div>
