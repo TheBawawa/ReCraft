@@ -8,6 +8,7 @@ import About from "./pages/About";
 import LoginForm from "./components/LoginForm";
 import SignupForm from "./components/SignupForm";
 import ProfileUI from "./components/profile";
+import Settings from "./components/Settings";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/login" element={<LoginForm />} />
         <Route path="/signup" element={<SignupForm />} />
         <Route path="/profile/:uid" element={<ProfileUI />} />
+        <Route path="/settings" element={<Settings/>}/>
       </Routes>
     </Router>
   );
