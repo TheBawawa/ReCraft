@@ -14,13 +14,6 @@ function App() {
   return (
     <Router>
       <Navbar />
-      <nav style={{ padding: "10px", borderBottom: "2px solid black" }}>
-        <Link to="/" style={{ marginRight: "15px" }}>Home</Link>
-        {/*<Link to="/about" style={{ marginRight: "15px" }}>About</Link>*/}
-        <Link to="/login" style={{ marginRight: "15px" }}>Login</Link>
-        <Link to="/signup">Sign Up</Link>
-      </nav>
-
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
