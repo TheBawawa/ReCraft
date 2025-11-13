@@ -35,12 +35,12 @@ Our app facilitates and enhances the search for DIY (Do it yourself) projects. I
 * [Sprint planning](https://docs.google.com/spreadsheets/d/1rRPT84waIOKSS-jNs7svqoX1Bdp5Rm51gihuctjPzRk/edit?gid=1056044682#gid=1056044682)
 * [Scrums](https://docs.google.com/document/d/1tpGb5-cIzuRoG6078RsbcmG2fu5dt1ofmsENnRTBLBo/edit?usp=sharing)
 * [Sprint demo video]()
-* [Sprint retrospective]()
+* [Sprint retrospective](https://docs.google.com/document/d/1CZEL6F4WFwpDGrs-TIiVhzW-C1NDwqEEJoCAobSz6N0/edit?tab=t.0)
 
 ### Sprint 2
 
-* [Sprint planning]()
-* [Scrums]()
+* [Sprint planning](https://docs.google.com/spreadsheets/d/1rRPT84waIOKSS-jNs7svqoX1Bdp5Rm51gihuctjPzRk/edit?gid=114637319#gid=114637319)
+* [Scrums](https://docs.google.com/document/d/1tpGb5-cIzuRoG6078RsbcmG2fu5dt1ofmsENnRTBLBo/edit?tab=t.3def2imeanyk)
 * [Sprint demo video]()
 * [Sprint retrospective]()
 
