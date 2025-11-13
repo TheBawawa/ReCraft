@@ -23,14 +23,19 @@ function LoginForm() {
       setLoading(true);
       setError("");
       
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
       
       setEmail("");
       setPassword("");
-      navigate("/dashboard");
+
+      navigate(`/profile/${user.uid}`);
+
     } catch (error) {
+
       console.error("Login error:", error.message);
       setError(error.message);
+      
     } finally {
       setLoading(false);
     }

@@ -7,6 +7,7 @@ import Home from "./pages/Home";
 import About from "./pages/About";
 import LoginForm from "./components/LoginForm";
 import SignupForm from "./components/SignupForm";
+import ProfileUI from "./components/profile";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/signup" element={<SignupForm />} />
+        <Route path="/profile/:uid" element={<ProfileUI />} />
       </Routes>
     </Router>
   );

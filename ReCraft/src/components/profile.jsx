@@ -1,4 +1,8 @@
 import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { Container, Card, Row, Col, Button, Image } from "react-bootstrap";
+
+
 
 async function fetchProfile() {
   await new Promise((r) => setTimeout(r, 400));
@@ -24,6 +28,7 @@ async function fetchGallery() {
 }
 
 export default function ProfileUI({ onSubscribeToggle }) {
+  const {uid} = useParams();
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState(null);
   const [gallery, setGallery] = useState([]);
@@ -32,7 +37,7 @@ export default function ProfileUI({ onSubscribeToggle }) {
   useEffect(() => {
     let mounted = true;
     (async () => {
-      const [p, g] = await Promise.all([fetchProfile(), fetchGallery()]);
+      const [p, g] = await Promise.all([fetchProfile(uid), fetchGallery(uid)]);
       if (!mounted) return;
       setProfile(p);
       setSubscribed(!!p.subscribed);
@@ -42,7 +47,7 @@ export default function ProfileUI({ onSubscribeToggle }) {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [uid]);
 
   const handleToggleSubscribe = async () => {
     const next = !subscribed;
@@ -56,74 +61,108 @@ export default function ProfileUI({ onSubscribeToggle }) {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-start justify-center py-10 px-4 bg-white">
-      <div className="w-full max-w-6xl rounded-2xl p-6 md:p-10 bg-white border border-black/10">
-        <div className="grid grid-cols-1 md:grid-cols-[auto_auto_1fr] gap-6 items-start">
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "linear-gradient(135deg, #89d957 0%, #1b9aaa 100%)",
+        padding: "40px 0",
+      }}
+    >
+      <Container>
+        {/* Profile Header Section */}
+        <Card className="shadow-lg border-0 rounded-4 mb-5">
+          <Card.Body>
+            <Row className="align-items-center text-center text-md-start">
+              
+              {/* Profile Image */}
+              <Col xs={12} md="auto" className="mb-3 mb-md-0">
+                <div
+                  className="d-inline-block bg-light rounded-circle border"
+                  style={{
+                    width: "120px",
+                    height: "120px",
+                    overflow: "hidden",
+                  }}
+                >
+                  {profile?.avatarUrl ? (
+                    <Image
+                      src={profile.avatarUrl}
+                      alt="avatar"
+                      className="w-100 h-100 object-fit-cover"
+                      roundedCircle
+                    />
+                  ) : (
+                    <div className="d-flex align-items-center justify-content-center h-100 text-muted fw-semibold">
+                      PFP
+                    </div>
+                  )}
+                </div>
+              </Col>
 
-          {/* Profile pic */}
-          <div className="flex items-center gap-4">
-            <div className="h-28 w-28 md:h-32 md:w-32 rounded-full bg-gray-200 flex items-center justify-center text-xl font-semibold overflow-hidden">
-              {profile?.avatarUrl ? (
-                <img
-                  src={profile.avatarUrl}
-                  alt="avatar"
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <span>pfp</span>
-              )}
-            </div>
-          </div>
+              {/* User Info */}
+              <Col md>
+                <h3 className="fw-bold mb-1">{profile?.name}</h3>
+                <p className="text-muted mb-2">{profile?.email}</p>
 
-          {/* Subscribe */}
-          <div className="flex md:justify-start">
-            <button
-              onClick={handleToggleSubscribe}
-              disabled={loading}
-              className="px-5 py-2 rounded-xl bg-black text-white font-medium shadow active:translate-y-[2px]"
-            >
-              {subscribed ? "Subscribed" : "Subscribe"}
-            </button>
-          </div>
+                {/* Subscribe Button */}
+                <Button
+                  variant={subscribed ? "dark" : "outline-dark"}
+                  onClick={handleToggleSubscribe}
+                  className="fw-semibold px-4"
+                >
+                  {subscribed ? "Subscribed" : "Subscribe"}
+                </Button>
+              </Col>
 
-          {/* Stats */}
-          <div className="relative">
-            <div className="absolute -right-2 -bottom-2 h-full w-full rounded-3xl bg-black/60" />
-            <div className="relative bg-white rounded-3xl px-6 py-5 border border-black/10">
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <Stat label="Posts" value={loading ? "—" : profile?.postsCount ?? 0} />
-                <Stat label="Likes" value={loading ? "—" : profile?.likesCount ?? 0} />
-                <Stat label="Followers" value={loading ? "—" : profile?.followersCount ?? 0} />
-              </div>
-            </div>
-          </div>
-        </div>
+              {/* Stats */}
+              <Col md="auto" className="text-center text-md-end mt-3 mt-md-0">
+                <Row className="g-2">
+                  <Col xs={4}>
+                    <div>
+                      <h6 className="fw-bold mb-0">{profile?.postsCount}</h6>
+                      <small className="text-muted">Posts</small>
+                    </div>
+                  </Col>
+                  <Col xs={4}>
+                    <div>
+                      <h6 className="fw-bold mb-0">{profile?.likesCount}</h6>
+                      <small className="text-muted">Likes</small>
+                    </div>
+                  </Col>
+                  <Col xs={4}>
+                    <div>
+                      <h6 className="fw-bold mb-0">{profile?.followersCount}</h6>
+                      <small className="text-muted">Followers</small>
+                    </div>
+                  </Col>
+                </Row>
+              </Col>
+            </Row>
+          </Card.Body>
+        </Card>
 
-        {/* Gallery */}
-        <div className="mt-10 relative">
-          <div className="absolute -right-3 -bottom-3 h-full w-full rounded-[2rem] bg-black/60" />
-          <div className="relative bg-white rounded-[2rem] p-6 md:p-8 border border-black/10">
-            <h2 className="text-2xl font-semibold mb-5">Gallery</h2>
+        {/* Gallery Section */}
+        <Card className="shadow-sm border-0 rounded-4">
+          <Card.Body>
+            <h4 className="fw-bold mb-4 text-center text-md-start">Gallery</h4>
 
-            {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className="h-40 bg-gray-200 rounded-3xl animate-pulse" />
-                ))}
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {gallery.slice(0, 9).map((item) => (
-                  <figure key={item.id} className="rounded-3xl overflow-hidden aspect-[4/3]">
-                    <img src={item.imageUrl} alt="" className="w-full h-full object-cover" />
-                  </figure>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-      </div>
+            <Row className="g-4">
+              {gallery.map((item) => (
+                <Col key={item.id} xs={12} sm={6} md={4}>
+                  <Card className="border-0 shadow-sm rounded-4 overflow-hidden">
+                    <Card.Img
+                      src={item.imageUrl}
+                      alt={item.title}
+                      className="img-fluid"
+                      style={{ height: "200px", objectFit: "cover" }}
+                    />
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+          </Card.Body>
+        </Card>
+      </Container>
     </div>
   );
 }
