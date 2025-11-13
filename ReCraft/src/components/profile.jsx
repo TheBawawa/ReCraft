@@ -1,39 +1,64 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Container, Card, Row, Col, Button, Image } from "react-bootstrap";
-
-
-
-async function fetchProfile() {
-  await new Promise((r) => setTimeout(r, 400));
-  return {
-    id: "u_123",
-    name: "Demo User",
-    email: "demo@example.com",
-    avatarUrl: "",
-    postsCount: 12,
-    likesCount: 340,
-    followersCount: 98,
-    subscribed: false,
-  };
-}
-
-async function fetchGallery() {
-  await new Promise((r) => setTimeout(r, 300));
-  return Array.from({ length: 6 }).map((_, i) => ({
-    id: `g_${i}`,
-    imageUrl: `https://picsum.photos/seed/${i + 3}/600/400`,
-    title: `Post #${i + 1}`,
-  }));
-}
+import { doc, getDoc, collection, getDocs, query, where, orderBy } from "firebase/firestore";
+import { db } from "../firebase"; 
 
 export default function ProfileUI({ onSubscribeToggle }) {
-  const {uid} = useParams();
+  const { uid } = useParams(); // get user id from route
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState(null);
   const [gallery, setGallery] = useState([]);
   const [subscribed, setSubscribed] = useState(false);
 
+
+async function fetchProfile(uid) {
+  try {
+    const docRef = doc(db, "users", uid);
+    const docSnap = await getDoc(docRef);
+
+    if (!docSnap.exists()) throw new Error("User profile not found");
+
+    const data = docSnap.data();
+    return {
+      id: uid,
+      username: data.username || "",
+      name: data.name || "",
+      email: data.email || "",
+      avatarUrl: data.avatarUrl || "",
+      postsCount: data.postsCount || 0,
+      likesCount: data.likesCount || 0,
+      followersCount: data.followersCount || 0,
+      subscribed: data.subscribed || false,
+    };
+  } catch (err) {
+    console.error("Error fetching profile:", err);
+    return null;
+  }
+}
+
+
+async function fetchGallery() {
+  try {
+      const postsRef = collection(db, "posts");
+      const q = query(postsRef, where("userId", "==", uid), orderBy("createdAt", "desc"));
+      const snapshot = await getDocs(q);
+
+      const galleryData = snapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          imageUrl: data.imageUrl,
+          title: data.title,
+        };
+      });
+
+      return galleryData;
+    } catch (err) {
+      console.error("Error fetching gallery:", err);
+      return [];
+    }
+}
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -102,6 +127,7 @@ export default function ProfileUI({ onSubscribeToggle }) {
               {/* User Info */}
               <Col md>
                 <h3 className="fw-bold mb-1">{profile?.name}</h3>
+                <p className="text-muted mb-1">@{profile?.username}</p> {/* username */}
                 <p className="text-muted mb-2">{profile?.email}</p>
 
                 {/* Subscribe Button */}
