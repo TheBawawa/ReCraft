@@ -1,9 +1,10 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { auth } from "../firebase";
 
 function ProfileDropdown() {
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((u) => setUser(u));
@@ -13,6 +14,7 @@ function ProfileDropdown() {
   const handleLogout = async () => {
     try {
       await auth.signOut();
+      navigate("/"); // redirect to home page after logout
     } catch (err) {
       console.error("Logout failed:", err);
     }
