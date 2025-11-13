@@ -29,8 +29,15 @@ function SignupForm() {
 
       await setDoc(doc(db, "users", user.uid), {
         username,
+        name: username,         // or use a separate 'name' field from the form
         email,
+        avatarUrl: "",           // default avatar
+        postsCount: 0,           // default stats
+        likesCount: 0,
+        followersCount: 0,
+        subscribed: false,
       });
+
 
       setUsername("");
       setEmail("");
