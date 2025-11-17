@@ -1,0 +1,78 @@
+#MainPost-Box{
+                background-color: #F8FFE5;
+                width:75%;
+                margin-left: auto;
+                margin-right: auto;
+                border: 5px solid black ;
+                margin-bottom: 8%;
+                position: relative;
+                transition: 0.8s ease-in-out;
+                border-radius: 3%;
+                overflow: hidden;
+                text-align: left;
+            }
+#MM-Img{
+    border-radius: 10%;
+    display: block;
+    margin: 0 auto;
+    padding-top: 3%;
+    padding-bottom: 3%;
+    max-height: 50%;
+}
+button{
+    outline-style: none;
+    box-shadow: none;
+    border: transparent;
+}
+button:hover{
+    outline-style: none;
+    box-shadow: none;
+    border: transparent;
+}
+.Col{
+    padding: 0%;
+}
+
+#MM-Content{
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 0%;
+    padding-right: 0%;
+    padding-bottom: 3%;
+    
+    display: flex;
+    column-gap: 2px;
+   align-items: center;
+   justify-content: center;
+}
+
+#SideComment{
+    background-color: #d3d6cb7e;
+    display: none;
+    position: absolute;
+    top: 0;
+    right: 0;
+    transition: 0.8s ease-in-out;
+    height: 100%; 
+    border-radius: 0 3% 3% 0;
+    border-left: 5px solid black;
+   
+
+    padding: 2%;
+}
+
+#comment-Input{
+    background: transparent;
+    border: none;
+    border: bottom;
+    transition: 0.8s;
+    border-bottom: 2.5px solid rgb(248, 255, 229);
+}
+#comment-Input:focus{
+    outline-style: none;
+    box-shadow: none;
+    background-color: rgba(162, 186, 203, 0.35);
+    border-bottom: 4px solid #1b9aaa;
+    transition: 0.5s;
+}

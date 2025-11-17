@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import PostTemplate from "../components/PostTemplate";
 import "../App.css";
+import FeedPost from '../components/FeedPost';
 
 function Home() {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ function Home() {
         TEMPORAL ANA
       </button>
 
-      <PostTemplate />
+      <FeedPost/>
     </div>
   );
 }

@@ -2,6 +2,9 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import ProfileDropdown from "./ProfileDropdown";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import Autocomplete from "./AutoComplete";
+
+const suggestions = ["Plastic Bottles", "Paper", "Plastic", "Plastic Bottles", "Soda Cans", "Platic Bags", "Tubs", "Jugs", "Aluminum Cans", "Steel Cans", "Containers"];
 
 function Navbar() {
   const [open, setOpen] = useState(false);
@@ -22,8 +25,11 @@ function Navbar() {
         ReCraft
       </Link>
 
+      <div id="searchBar"><Autocomplete suggestions={suggestions}></Autocomplete></div>
+
       {/* Links */}
       <div className="ms-auto me-3">
+        
         <Link to="/" className="text-dark fw-semibold me-3 text-decoration-none">
           Home
         </Link>
