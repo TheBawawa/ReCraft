@@ -108,3 +108,25 @@ body {
   background-color: var(--coral);
   color: white;
 }
+
+/*Search Bar*/
+#searchBar{
+  input{
+    width: 100%;
+    padding: 8px;
+    padding-left: 25px;
+    outline-style: none;
+    box-shadow: none;
+    border: transparent;
+    transition: 0.8s;
+    border-bottom: 2.5px solid rgb(248, 255, 229);
+  }
+
+  input:focus{
+    outline-style: none;
+    box-shadow: none;
+    background-color: rgba(162, 186, 203, 0.35);
+    border-bottom: 4px solid #1b9aaa;
+    transition: 0.5s;
+  }
+}
