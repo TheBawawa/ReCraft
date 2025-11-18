@@ -5,6 +5,7 @@ import { auth } from "../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { signInWithPopup } from "firebase/auth";
 import { googleProvider } from "../firebase";
+import googleLogo from "../assets/google.svg";
 
 function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -49,10 +50,9 @@ function LoginForm() {
       setLoading(true);
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
-
       navigate(`/profile/${user.uid}`);
     } catch (err) {
-      console.error(err);
+      console.error("Google sign-in failed", err);
       setError("Google sign-in failed");
     } finally {
       setLoading(false);
@@ -152,7 +152,7 @@ function LoginForm() {
                     }}
                   >
                     <img 
-                      src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"
+                      src={googleLogo}
                       alt="google"
                       style={{ width: "20px", marginRight: "8px" }}
                     />

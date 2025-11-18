@@ -6,8 +6,12 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { signInWithPopup } from "firebase/auth";
 import { googleProvider } from "../firebase";
+import { useNavigate } from "react-router-dom";
+import googleLogo from "../assets/google.svg";
 
 function SignupForm() {
+  const navigate = useNavigate();
+
   const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -187,7 +191,7 @@ function SignupForm() {
                     }}
                   >
                     <img 
-                      src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"
+                      src={googleLogo}
                       alt="google"
                       style={{ width: "20px", marginRight: "8px" }}
                     /> 
