@@ -27,14 +27,8 @@ const Autocomplete = ({ suggestions }) => {
   };
 
   return (
-    <div style={{ width: "250px", position: "relative" }}>
-      <input
-        type="text"
-        value={inputValue}
-        onChange={handleChange}
-        placeholder="Search..."
-        style={{ width: "100%", padding: "8px" }}
-      />
+    <div id="searchBar" style={{ width: "75%", position: "relative" }}>
+      <input type="text" value={inputValue} onChange={handleChange} placeholder="Search..."/>
 
       {showList && filtered.length > 0 && (
         <ul
