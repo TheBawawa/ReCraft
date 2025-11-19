@@ -11,6 +11,8 @@
                 overflow: hidden;
                 text-align: left;
             }
+
+/*Image Style*/
 #MM-Img{
     border-radius: 10%;
     display: block;
@@ -19,6 +21,8 @@
     padding-bottom: 3%;
     max-height: 50%;
 }
+
+/*All Buttons*/
 button{
     outline-style: none;
     box-shadow: none;

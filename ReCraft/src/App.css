@@ -118,14 +118,17 @@ body {
     outline-style: none;
     box-shadow: none;
     border: transparent;
+    /*Bottom Line (Transparent)*/
     transition: 0.8s;
     border-bottom: 2.5px solid rgb(248, 255, 229);
   }
-
+  /*Active Search*/
   input:focus{
     outline-style: none;
     box-shadow: none;
     background-color: rgba(162, 186, 203, 0.35);
+
+    /*Bottom Line (Visible)*/
     border-bottom: 4px solid #1b9aaa;
     transition: 0.5s;
   }
