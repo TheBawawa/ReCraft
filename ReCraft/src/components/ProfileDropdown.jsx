@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { auth } from "../firebase";
 
+// Profile dropdown component showing different options based on authentication status
 function ProfileDropdown() {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
