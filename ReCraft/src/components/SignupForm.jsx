@@ -56,6 +56,8 @@ function SignupForm() {
     }
   };
 
+  // google signup is now available
+
   const handleGoogleSignup = async () => {
     try {
       setLoading(true);
