@@ -7,6 +7,8 @@ import { signInWithPopup } from "firebase/auth";
 import { googleProvider } from "../firebase";
 import googleLogo from "../assets/google.svg";
 
+// added google login functionality as well
+
 function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
