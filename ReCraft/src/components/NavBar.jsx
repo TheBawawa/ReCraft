@@ -4,6 +4,7 @@ import ProfileDropdown from "./ProfileDropdown";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import Autocomplete from "./AutoComplete";
 
+// Options for search, add cap sensitivity checking later
 const suggestions = ["Plastic Bottles", "Paper", "Plastic", "Plastic Bottles", "Soda Cans", "Platic Bags", "Tubs", "Jugs", "Aluminum Cans", "Steel Cans", "Containers"];
 
 function Navbar() {
