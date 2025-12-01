@@ -3,6 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { Form, Button, Container, Row, Col, Card, Alert } from "react-bootstrap";
 import { auth } from "../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithPopup } from "firebase/auth";
+import { googleProvider } from "../firebase";
+import googleLogo from "../assets/google.svg";
 
 function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -36,6 +39,21 @@ function LoginForm() {
       console.error("Login error:", error.message);
       setError(error.message);
       
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+  const handleGoogleLogin = async () => {
+    try {
+      setLoading(true);
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+      navigate(`/profile/${user.uid}`);
+    } catch (err) {
+      console.error("Google sign-in failed", err);
+      setError("Google sign-in failed");
     } finally {
       setLoading(false);
     }
@@ -120,6 +138,25 @@ function LoginForm() {
                     }}
                   >
                     {loading ? "Logging In..." : "Log In"}
+                  </Button>
+
+                  <Button 
+                    onClick={handleGoogleLogin}
+                    className="w-100 mb-3 fw-semibold"
+                    style={{
+                      padding: "12px",
+                      borderRadius: "10px",
+                      background: "#ffffff",
+                      color: "#000",
+                      border: "2px solid #4285F4"
+                    }}
+                  >
+                    <img 
+                      src={googleLogo}
+                      alt="google"
+                      style={{ width: "20px", marginRight: "8px" }}
+                    />
+                    Continue with Google
                   </Button>
 
                   <div className="text-center">

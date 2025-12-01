@@ -2,7 +2,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-import Navbar from "./components/Navbar";
+import Navbar from "./components/NavBar";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import LoginForm from "./components/LoginForm";
@@ -13,7 +13,7 @@ import Settings from "./components/Settings";
 function App() {
   return (
     <Router>
-      <Navbar />
+      <Navbar/>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
