@@ -41,7 +41,7 @@ Our app facilitates and enhances the search for DIY (Do it yourself) projects. I
 
 * [Sprint planning](https://docs.google.com/spreadsheets/d/1rRPT84waIOKSS-jNs7svqoX1Bdp5Rm51gihuctjPzRk/edit?gid=114637319#gid=114637319)
 * [Scrums](https://docs.google.com/document/d/1tpGb5-cIzuRoG6078RsbcmG2fu5dt1ofmsENnRTBLBo/edit?tab=t.3def2imeanyk)
-* [Sprint demo video]()
+* [Sprint demo video](https://drive.google.com/file/d/1E5cZ0dHFearUZyLedY3z0ExCcX_rsV9j/view?usp=sharing)
 * [Sprint retrospective](https://docs.google.com/document/d/1Z6fSOBb91eow61nMF6Qp7AK6gunNNCsJSEg2emSueck/edit?tab=t.0)
 
 ### Sprint 3
