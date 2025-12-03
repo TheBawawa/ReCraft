@@ -103,8 +103,8 @@ export default function ProfileUI({ onSubscribeToggle }) {
         const data = docSnap.data();
         return {
           id: docSnap.id,
-          imageUrl: data.imageUrl,
-          title: data.title,
+          imageUrl: data.mediaData || data.imageUrl, // Support both new (mediaData) and old (imageUrl) fields
+          title: data.title || data.text || "Untitled",
           tags: data.tags || [],
         };
       });

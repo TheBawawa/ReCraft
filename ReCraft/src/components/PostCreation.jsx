@@ -14,7 +14,8 @@ export default function PostCreation() {
     return unsubscribe;
   }, []);
 
-  const [media, setMedia] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
+  const [videoLink, setVideoLink] = useState("");
   const [text, setText] = useState("");
   const [tags, setTags] = useState([]);
 
@@ -27,13 +28,16 @@ export default function PostCreation() {
       alert("You must be logged in to post!");
       return;
     }
-    if (!text && !media) {
-      alert("Please add some text or media!");
+    if (!text && !imageFile && !videoLink) {
+      alert("Please add some text, an image, or a video link!");
       return;
     }
 
-    await createPost({ mediaFile: media, text, tags });
-    setMedia(null);
+    // Pass both imageFile and videoLink to createPost
+    await createPost({ imageFile, videoLink, text, tags });
+    
+    setImageFile(null);
+    setVideoLink("");
     setText("");
     setTags([]);
     alert("Post created successfully!");
@@ -49,8 +53,23 @@ export default function PostCreation() {
           <h2 className="fw-bold mb-4 text-center">Create a New Post</h2>
           <Form>
             <Form.Group className="mb-3">
-              <Form.Label>Upload Image or Video</Form.Label>
-              <Form.Control type="file" accept="image/*,video/*" onChange={(e) => setMedia(e.target.files[0])} />
+              <Form.Label>Upload Image</Form.Label>
+              <Form.Control 
+                type="file" 
+                accept="image/*" 
+                onChange={(e) => setImageFile(e.target.files[0])} 
+              />
+              {imageFile && <small className="text-muted">Selected: {imageFile.name}</small>}
+            </Form.Group>
+            
+            <Form.Group className="mb-3">
+              <Form.Label>Or Link a Video (YouTube, etc.)</Form.Label>
+              <Form.Control 
+                type="text" 
+                placeholder="https://www.youtube.com/watch?v=..." 
+                value={videoLink}
+                onChange={(e) => setVideoLink(e.target.value)} 
+              />
             </Form.Group>
 
             <Form.Group className="mb-3">
