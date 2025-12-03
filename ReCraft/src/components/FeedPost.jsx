@@ -6,8 +6,6 @@ import heartPhoto from '../assets/heart.png'
 import commPhoto from '../assets/chat.png'
 import sendPhoto from '../assets/up-arrow.png'
 
-
-{/** BootStrap Potential Imports: Button Group, Cards, Container, Row, Col */}
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -70,34 +68,30 @@ function addTask() {
         
        
         <div id="MainPost-Box">
-             {/* Pic of Post */}
+
             <img src='https://www.rowsignsandgraphics.com/wp-content/uploads/2021/08/Inset_Black_Square.jpg' alt='Black Square' style={{width: "50%"}} id='MM-Img'/>
 
-             {/* -----Container with Like Button/LikeAmount & Comment Button/Input----- */}
+
             <div id="MM-Content">
                
-                    {/* ------Like Button------ */}
                     
                     <button style={{background: "transparent", maxWidth: "15%"}}><img src={heartPhoto} style={{width: "100%", borderRadius:"20%"}} onClick={likeButton}/> </button><p style={{fontSize: "30px", paddingRight: "3%", paddingLeft: "2%"}}>{likeAmt}</p>
                     
 
-                    {/* -----Comment Button------ */}
                    
                     <InputGroup id="commentGroup"> 
                     <div style={{background: "transparent", maxWidth: "15%"}} >
                         <button onClick={openComm} style={{background: "transparent", maxWidth: "100%"}}><img src={commPhoto} style={{width: "100%"}}/></button>
                     </div>
-                     {/* -----Comment Input------ */}
+
                     <Form.Control placeholder='Comment Something Kind' id="comment-Input"></Form.Control>
                     
-                     {/* -----Comment Submit Button------ */}
                     <button style={{background: "transparent", maxWidth: "15%"}} onClick={addTask}>
                         <img src={sendPhoto} style={{width: "100%"}}/>
                     </button>
                     </InputGroup>
             </div>
 
-             {/* -----Comment Sectioon------ */}
              <div id="SideComment">
                         <h2>Comments</h2>
                         <p><b>User593020:</b>Super Cool Craft</p>
@@ -111,7 +105,6 @@ function addTask() {
                  
       
        
-        {/* -----Comment Submitted Alert------ */}
         <Modal show={show} onHide={handleClose} centered>
                         <center><Modal.Title>Comment Submitted</Modal.Title></center>
                        <Modal.Footer><button onClick={handleClose}>Close</button></Modal.Footer>

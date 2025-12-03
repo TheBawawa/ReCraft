@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom";
 import { Container, Card, Row, Col, Button, Image, Spinner } from "react-bootstrap";
 import { doc, getDoc, collection, getDocs, query, where, orderBy } from "firebase/firestore";
 import { db } from "../firebase";
+import { useNavigate } from "react-router-dom";
+
 
 const DEMO_PROFILE = (uid) => ({
   id: uid,
@@ -50,6 +52,7 @@ export default function ProfileUI({ onSubscribeToggle }) {
   const [profile, setProfile] = useState(null);
   const [gallery, setGallery] = useState([]);
   const [subscribed, setSubscribed] = useState(false);
+  const navigate = useNavigate();
 
   // Tag filter
   const [selectedTag, setSelectedTag] = useState("All");
@@ -100,8 +103,8 @@ export default function ProfileUI({ onSubscribeToggle }) {
         const data = docSnap.data();
         return {
           id: docSnap.id,
-          imageUrl: data.imageUrl,
-          title: data.title,
+          imageUrl: data.mediaData || data.imageUrl, // Support both new (mediaData) and old (imageUrl) fields
+          title: data.title || data.text || "Untitled",
           tags: data.tags || [],
         };
       });
@@ -233,6 +236,13 @@ export default function ProfileUI({ onSubscribeToggle }) {
                   className="fw-semibold px-4"
                 >
                   {subscribed ? "Subscribed" : "Subscribe"}
+                </Button>
+                <Button
+                  variant="outline-dark"
+                  className="fw-semibold px-4 ms-2"
+                  onClick={() => navigate("/create-post")}
+                >
+                  Create Post
                 </Button>
               </Col>
 

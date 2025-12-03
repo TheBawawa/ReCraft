@@ -1,28 +1,23 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import PostTemplate from "../components/PostTemplate";
-import "../App.css";
-import FeedPost from '../components/FeedPost';
+import { useFirebase } from "../components/context/FirebaseContext";
 
 function Home() {
-  const navigate = useNavigate();
+  const { allPosts } = useFirebase();
 
   return (
-    <div className="center-content">
-      <h1 style={{ color: "var(--blue-gray)" }}>ReCraft</h1>
-      <p style={{ color: "var(--coral)" }}>Team 2</p>
-      <p style={{ color: "var(--blue-gray)" }}>
-        Ana Paredes — Diya Brown — Rui Wang — Jessica Williamson
-      </p>
-
-      <button className="circle-btn" onClick={() => navigate("/login")}>
-        TEMPORAL ANA
-      </button>
-
-      <FeedPost/>
+    <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #89d957 0%, #1b9aaa 100%)", padding: "40px 0" }}>
+      <div className="center-content">
+        {allPosts.length === 0 ? (
+          <p style={{ textAlign: "center", color: "#fff", fontSize: "1.2rem" }}>No posts yet. App is running!</p>
+        ) : (
+          allPosts
+            .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))
+            .map((post) => <PostTemplate key={post.id} post={post} />)
+        )}
+      </div>
     </div>
   );
 }
-//not touch
 
 export default Home;
