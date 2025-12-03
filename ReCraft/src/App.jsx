@@ -9,21 +9,26 @@ import LoginForm from "./components/LoginForm";
 import SignupForm from "./components/SignupForm";
 import ProfileUI from "./components/profile";
 import Settings from "./components/Settings";
+import PostCreation from "./components/PostCreation";
+import FirebaseProvider from "./components/context/FirebaseContext";
 
 function App() {
   return (
-    <Router>
-      <Navbar/>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/login" element={<LoginForm />} />
-        <Route path="/signup" element={<SignupForm />} />
-        <Route path="/profile/:uid" element={<ProfileUI />} />
-        <Route path="/settings" element={<Settings/>}/>
-      </Routes>
-    </Router>
+    <FirebaseProvider>
+      <Router>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/login" element={<LoginForm />} />
+          <Route path="/signup" element={<SignupForm />} />
+          <Route path="/profile/:uid" element={<ProfileUI />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/create-post" element={<PostCreation />} />
+        </Routes>
+      </Router>
+    </FirebaseProvider>
   );
 }
-//not touched
+
 export default App;
