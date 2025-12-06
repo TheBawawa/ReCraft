@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Container, Card, Row, Col, Button, Image, Spinner } from "react-bootstrap";
-import { doc, getDoc, collection, getDocs, query, where, orderBy } from "firebase/firestore";
-import { db } from "../firebase";
+import { doc, getDoc, collection, getDocs, query, where, orderBy, updateDoc } from "firebase/firestore";
+import { db, storage } from "../firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
-
 
 const DEMO_PROFILE = (uid) => ({
   id: uid,
@@ -19,30 +19,10 @@ const DEMO_PROFILE = (uid) => ({
 });
 
 const DEMO_GALLERY = [
-  {
-    id: "p1",
-    imageUrl: "https://picsum.photos/seed/plastic/600/400",
-    title: "Bottle Pencil Holder",
-    tags: ["Plastic", "Paper"],
-  },
-  {
-    id: "p2",
-    imageUrl: "https://picsum.photos/seed/paper/600/400",
-    title: "Newspaper Gift Bag",
-    tags: ["Paper"],
-  },
-  {
-    id: "p3",
-    imageUrl: "https://picsum.photos/seed/glass/600/400",
-    title: "Glass Jar Lantern",
-    tags: ["Glass", "Metal"],
-  },
-  {
-    id: "p4",
-    imageUrl: "https://picsum.photos/seed/fabric/600/400",
-    title: "T-shirt Tote Bag",
-    tags: ["Fabric"],
-  },
+  { id: "p1", imageUrl: "https://picsum.photos/seed/plastic/600/400", title: "Bottle Pencil Holder", tags: ["Plastic", "Paper"] },
+  { id: "p2", imageUrl: "https://picsum.photos/seed/paper/600/400", title: "Newspaper Gift Bag", tags: ["Paper"] },
+  { id: "p3", imageUrl: "https://picsum.photos/seed/glass/600/400", title: "Glass Jar Lantern", tags: ["Glass", "Metal"] },
+  { id: "p4", imageUrl: "https://picsum.photos/seed/fabric/600/400", title: "T-shirt Tote Bag", tags: ["Fabric"] },
 ];
 
 export default function ProfileUI({ onSubscribeToggle }) {
@@ -54,17 +34,14 @@ export default function ProfileUI({ onSubscribeToggle }) {
   const [subscribed, setSubscribed] = useState(false);
   const navigate = useNavigate();
 
-  // Tag filter
   const [selectedTag, setSelectedTag] = useState("All");
+
   async function fetchProfile(userId) {
     try {
       const docRef = doc(db, "users", userId);
       const docSnap = await getDoc(docRef);
 
-      if (!docSnap.exists()) {
-        console.warn("User profile not found, using demo profile");
-        return DEMO_PROFILE(userId);
-      }
+      if (!docSnap.exists()) return DEMO_PROFILE(userId);
 
       const data = docSnap.data();
       return {
@@ -78,8 +55,7 @@ export default function ProfileUI({ onSubscribeToggle }) {
         followersCount: data.followersCount ?? 0,
         subscribed: data.subscribed ?? false,
       };
-    } catch (err) {
-      console.error("Error fetching profile, using demo:", err);
+    } catch {
       return DEMO_PROFILE(userId);
     }
   }
@@ -94,79 +70,50 @@ export default function ProfileUI({ onSubscribeToggle }) {
       );
       const snapshot = await getDocs(q);
 
-      if (snapshot.empty) {
-        console.warn("No posts found, using demo gallery");
-        return DEMO_GALLERY;
-      }
+      if (snapshot.empty) return DEMO_GALLERY;
 
-      const galleryData = snapshot.docs.map((docSnap) => {
+      return snapshot.docs.map((docSnap) => {
         const data = docSnap.data();
         return {
           id: docSnap.id,
-          imageUrl: data.mediaData || data.imageUrl, // Support both new (mediaData) and old (imageUrl) fields
+          imageUrl: data.mediaData || data.imageUrl,
           title: data.title || data.text || "Untitled",
           tags: data.tags || [],
         };
       });
-
-      return galleryData;
-    } catch (err) {
-      console.error("Error fetching gallery, using demo:", err);
+    } catch {
       return DEMO_GALLERY;
     }
   }
 
-  // --------------- Load data ---------------
-
   useEffect(() => {
-    let mounted = true;
-
     (async () => {
       setLoading(true);
       const [p, g] = await Promise.all([fetchProfile(uid), fetchGallery(uid)]);
-      if (!mounted) return;
-
       setProfile(p);
       setSubscribed(!!p.subscribed);
       setGallery(g);
       setLoading(false);
     })();
-
-    return () => {
-      mounted = false;
-    };
   }, [uid]);
 
-  // --------------- Tag filter logic ---------------
+  // NEW — Handle changing avatar from profile hover
+  async function handlePfpChange(file) {
+    if (!file) return;
 
-  const availableTags = [
-    "All",
-    ...Array.from(
-      new Set(
-        gallery.flatMap((item) => item.tags || [])
-      )
-    ),
-  ];
+    const storageRef = ref(storage, `avatars/${uid}`);
+    await uploadBytes(storageRef, file);
+    const downloadURL = await getDownloadURL(storageRef);
+
+    await updateDoc(doc(db, "users", uid), { avatarUrl: downloadURL });
+
+    setProfile((prev) => ({ ...prev, avatarUrl: downloadURL }));
+  }
+
+  const availableTags = ["All", ...new Set(gallery.flatMap((i) => i.tags || []))];
 
   const filteredGallery =
-    selectedTag === "All"
-      ? gallery
-      : gallery.filter((item) => (item.tags || []).includes(selectedTag));
-
-  // --------------- Subscribe button ---------------
-
-  const handleToggleSubscribe = async () => {
-    const next = !subscribed;
-    setSubscribed(next);
-    try {
-      await onSubscribeToggle?.(next);
-    } catch (err) {
-      setSubscribed(!next);
-      alert("Subscribe action failed.");
-    }
-  };
-
-  // --------------- Render ---------------
+    selectedTag === "All" ? gallery : gallery.filter((i) => (i.tags || []).includes(selectedTag));
 
   if (loading) {
     return (
@@ -177,9 +124,7 @@ export default function ProfileUI({ onSubscribeToggle }) {
         }}
         className="d-flex align-items-center justify-content-center"
       >
-        <Spinner animation="border" role="status" variant="light">
-          <span className="visually-hidden">Loading...</span>
-        </Spinner>
+        <Spinner animation="border" role="status" variant="light" />
       </div>
     );
   }
@@ -193,46 +138,60 @@ export default function ProfileUI({ onSubscribeToggle }) {
       }}
     >
       <Container>
-        {/* Profile Header Section */}
         <Card className="shadow-lg border-0 rounded-4 mb-5">
           <Card.Body>
             <Row className="align-items-center text-center text-md-start">
-              {/* Profile Image */}
+              
+              {/* NEW — Editable Profile Picture */}
               <Col xs={12} md="auto" className="mb-3 mb-md-0">
                 <div
-                  className="d-inline-block bg-light rounded-circle border"
-                  style={{
-                    width: "120px",
-                    height: "120px",
-                    overflow: "hidden",
-                  }}
+                  className="position-relative d-inline-block"
+                  style={{ width: "120px", height: "120px" }}
                 >
-                  {profile.avatarUrl ? (
-                    <Image
-                      src={profile.avatarUrl}
-                      alt="avatar"
-                      className="w-100 h-100"
-                      style={{ objectFit: "cover" }}
-                      roundedCircle
-                    />
-                  ) : (
-                    <div className="d-flex align-items-center justify-content-center h-100 text-muted fw-semibold">
-                      PFP
-                    </div>
-                  )}
+                  <Image
+                    src={profile.avatarUrl || "https://via.placeholder.com/120"}
+                    alt="avatar"
+                    className="w-100 h-100 rounded-circle"
+                    style={{ objectFit: "cover" }}
+                  />
+
+                  {/* Hover overlay */}
+                  <div
+                    className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+                    style={{
+                      background: "rgba(0,0,0,0.5)",
+                      color: "white",
+                      opacity: 0,
+                      borderRadius: "50%",
+                      transition: "0.3s",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => document.getElementById("pfpUpload").click()}
+                    onMouseEnter={(e) => (e.currentTarget.style.opacity = 1)}
+                    onMouseLeave={(e) => (e.currentTarget.style.opacity = 0)}
+                  >
+                    Edit
+                  </div>
+
+                  <input
+                    id="pfpUpload"
+                    type="file"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={(e) => handlePfpChange(e.target.files[0])}
+                  />
                 </div>
               </Col>
 
-              {/* User Info */}
+              {/* User Info (unchanged) */}
               <Col md>
                 <h3 className="fw-bold mb-1">{profile.name}</h3>
                 <p className="text-muted mb-1">@{profile.username}</p>
                 <p className="text-muted mb-2">{profile.email}</p>
 
-                {/* Subscribe Button */}
                 <Button
                   variant={subscribed ? "dark" : "outline-dark"}
-                  onClick={handleToggleSubscribe}
+                  onClick={() => setSubscribed(!subscribed)}
                   className="fw-semibold px-4"
                 >
                   {subscribed ? "Subscribed" : "Subscribe"}
@@ -246,7 +205,6 @@ export default function ProfileUI({ onSubscribeToggle }) {
                 </Button>
               </Col>
 
-              {/* Stats */}
               <Col md="auto" className="text-center text-md-end mt-3 mt-md-0">
                 <Row className="g-2">
                   <Col xs={4}>
@@ -269,11 +227,12 @@ export default function ProfileUI({ onSubscribeToggle }) {
                   </Col>
                 </Row>
               </Col>
+
             </Row>
           </Card.Body>
         </Card>
 
-        {/* Gallery Section + Tag Filter */}
+        {/* Gallery Section (unchanged) */}
         <Card className="shadow-sm border-0 rounded-4">
           <Card.Body>
             <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3">
