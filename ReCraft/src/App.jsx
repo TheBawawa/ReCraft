@@ -1,3 +1,4 @@
+import { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
@@ -13,11 +14,14 @@ import PostCreation from "./components/PostCreation";
 import FirebaseProvider from "./components/context/FirebaseContext";
 
 function App() {
+  const [searchTerm, setSearchTerm] = useState("");
+
   return (
     <FirebaseProvider>
-      <Navbar />
+      <Navbar onSearch={setSearchTerm} />
+
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Home searchTerm={searchTerm} />} />
         <Route path="/about" element={<About />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/signup" element={<SignupForm />} />

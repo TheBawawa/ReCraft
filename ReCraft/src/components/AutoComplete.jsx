@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
-const Autocomplete = ({ suggestions }) => {
+const Autocomplete = ({ suggestions, onSearch }) => {
   const [inputValue, setInputValue] = useState("");
   const [filtered, setFiltered] = useState([]);
   const [showList, setShowList] = useState(false);
@@ -9,6 +9,10 @@ const Autocomplete = ({ suggestions }) => {
   const handleChange = (e) => {
     const value = e.target.value;
     setInputValue(value);
+
+    if (onSearch) {
+      onSearch(value);
+    }
 
     const matches =
       value.length > 0
@@ -18,21 +22,38 @@ const Autocomplete = ({ suggestions }) => {
         : [];
 
     setFiltered(matches);
-    setShowList(true);
+    setShowList(matches.length > 0);
   };
 
   const handleSelect = (value) => {
     setInputValue(value);
     setShowList(false);
+
+    if (onSearch) {
+      onSearch(value);
+    }
   };
 
   return (
-    <div id="searchBar" style={{ width: "75%", position: "relative" }}>
-      <input type="text" value={inputValue} onChange={handleChange} placeholder="Search..."/>
+    <div style={{ width: "100%", position: "relative" }}>
+      <input
+        type="text"
+        value={inputValue}
+        onChange={handleChange}
+        placeholder="Search by text or tag..."
+        style={{
+          width: "100%",
+          padding: "6px 10px",
+          borderRadius: "4px",
+          border: "1px solid #ccc",
+        }}
+      />
 
       {showList && filtered.length > 0 && (
         <ul
-          style={{ position: "absolute", top: "40px",
+          style={{
+            position: "absolute",
+            top: "36px",
             left: 0,
             right: 0,
             background: "white",
@@ -46,7 +67,13 @@ const Autocomplete = ({ suggestions }) => {
           }}
         >
           {filtered.map((item) => (
-            <li key={item} onClick={() => handleSelect(item)} style={{padding: "8px", cursor: "pointer",}}> {item} </li>
+            <li
+              key={item}
+              onClick={() => handleSelect(item)}
+              style={{ padding: "8px", cursor: "pointer" }}
+            >
+              {item}
+            </li>
           ))}
         </ul>
       )}
