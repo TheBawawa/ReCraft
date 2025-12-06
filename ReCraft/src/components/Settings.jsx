@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Container, Row, Col, Card, Form, Button, Alert } from "react-bootstrap";
-import { auth, db } from "../firebase";
+import { auth, db, storage } from "../firebase";
 import { updatePassword, updateProfile } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 export default function Settings() {
   const user = auth.currentUser;
@@ -16,6 +17,9 @@ export default function Settings() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  // NEW — for profile picture upload
+  const [newAvatar, setNewAvatar] = useState(null);
 
   useEffect(() => {
     async function fetchUserData() {
@@ -58,8 +62,22 @@ export default function Settings() {
         await updatePassword(user, newPassword);
       }
 
+      // NEW — Upload new profile picture
+      if (newAvatar) {
+        const storageRef = ref(storage, `avatars/${user.uid}`);
+        await uploadBytes(storageRef, newAvatar);
+        const downloadURL = await getDownloadURL(storageRef);
+
+        await updateProfile(user, { photoURL: downloadURL });
+
+        await updateDoc(doc(db, "users", user.uid), {
+          avatarUrl: downloadURL,
+        });
+      }
+
       setSuccess("Settings updated successfully!");
       setNewPassword("");
+      setNewAvatar(null);
     } catch (err) {
       console.error("Update error:", err);
       setError(err.message || "Failed to update settings");
@@ -166,6 +184,21 @@ export default function Settings() {
                     onChange={() => setShowPassword(!showPassword)}
                     className="mb-4"
                   />
+
+                  {/* NEW — Profile Picture Upload */}
+                  <Form.Group className="mb-3">
+                    <Form.Label className="fw-semibold">Profile Picture</Form.Label>
+                    <Form.Control
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setNewAvatar(e.target.files[0])}
+                      style={{
+                        padding: "12px",
+                        borderRadius: "10px",
+                        border: "2px solid #e0e0e0",
+                      }}
+                    />
+                  </Form.Group>
 
                   <Button
                     type="submit"
