@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Container, Card, Row, Col, Button, Image, Spinner } from "react-bootstrap";
 import { doc, getDoc, collection, getDocs, query, where, orderBy, updateDoc } from "firebase/firestore";
 import { db, storage } from "../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { useNavigate } from "react-router-dom";
 
 const DEMO_PROFILE = (uid) => ({
   id: uid,
@@ -25,15 +24,14 @@ const DEMO_GALLERY = [
   { id: "p4", imageUrl: "https://picsum.photos/seed/fabric/600/400", title: "T-shirt Tote Bag", tags: ["Fabric"] },
 ];
 
-export default function ProfileUI({ onSubscribeToggle }) {
+export default function ProfileUI() {
   const { uid } = useParams();
+  const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState(null);
   const [gallery, setGallery] = useState([]);
   const [subscribed, setSubscribed] = useState(false);
-  const navigate = useNavigate();
-
   const [selectedTag, setSelectedTag] = useState("All");
 
   async function fetchProfile(userId) {
@@ -63,11 +61,7 @@ export default function ProfileUI({ onSubscribeToggle }) {
   async function fetchGallery(userId) {
     try {
       const postsRef = collection(db, "posts");
-      const q = query(
-        postsRef,
-        where("userId", "==", userId),
-        orderBy("createdAt", "desc")
-      );
+      const q = query(postsRef, where("userId", "==", userId), orderBy("createdAt", "desc"));
       const snapshot = await getDocs(q);
 
       if (snapshot.empty) return DEMO_GALLERY;
@@ -97,57 +91,36 @@ export default function ProfileUI({ onSubscribeToggle }) {
     })();
   }, [uid]);
 
-  // NEW — Handle changing avatar from profile hover
   async function handlePfpChange(file) {
     if (!file) return;
-
     const storageRef = ref(storage, `avatars/${uid}`);
     await uploadBytes(storageRef, file);
     const downloadURL = await getDownloadURL(storageRef);
-
     await updateDoc(doc(db, "users", uid), { avatarUrl: downloadURL });
-
     setProfile((prev) => ({ ...prev, avatarUrl: downloadURL }));
   }
 
   const availableTags = ["All", ...new Set(gallery.flatMap((i) => i.tags || []))];
-
-  const filteredGallery =
-    selectedTag === "All" ? gallery : gallery.filter((i) => (i.tags || []).includes(selectedTag));
+  const filteredGallery = selectedTag === "All" ? gallery : gallery.filter((i) => (i.tags || []).includes(selectedTag));
 
   if (loading) {
     return (
-      <div
-        style={{
-          minHeight: "100vh",
-          background: "linear-gradient(135deg, #89d957 0%, #1b9aaa 100%)",
-        }}
-        className="d-flex align-items-center justify-content-center"
-      >
+      <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #89d957 0%, #1b9aaa 100%)" }}
+           className="d-flex align-items-center justify-content-center">
         <Spinner animation="border" role="status" variant="light" />
       </div>
     );
   }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "linear-gradient(135deg, #89d957 0%, #1b9aaa 100%)",
-        padding: "40px 0",
-      }}
-    >
+    <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #89d957 0%, #1b9aaa 100%)", padding: "40px 0" }}>
       <Container>
         <Card className="shadow-lg border-0 rounded-4 mb-5">
           <Card.Body>
             <Row className="align-items-center text-center text-md-start">
-              
-              {/* NEW — Editable Profile Picture */}
+
               <Col xs={12} md="auto" className="mb-3 mb-md-0">
-                <div
-                  className="position-relative d-inline-block"
-                  style={{ width: "120px", height: "120px" }}
-                >
+                <div className="position-relative d-inline-block" style={{ width: "120px", height: "120px" }}>
                   <Image
                     src={profile.avatarUrl || "https://via.placeholder.com/120"}
                     alt="avatar"
@@ -155,7 +128,6 @@ export default function ProfileUI({ onSubscribeToggle }) {
                     style={{ objectFit: "cover" }}
                   />
 
-                  {/* Hover overlay */}
                   <div
                     className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
                     style={{
@@ -183,7 +155,6 @@ export default function ProfileUI({ onSubscribeToggle }) {
                 </div>
               </Col>
 
-              {/* User Info (unchanged) */}
               <Col md>
                 <h3 className="fw-bold mb-1">{profile.name}</h3>
                 <p className="text-muted mb-1">@{profile.username}</p>
@@ -196,6 +167,7 @@ export default function ProfileUI({ onSubscribeToggle }) {
                 >
                   {subscribed ? "Subscribed" : "Subscribe"}
                 </Button>
+
                 <Button
                   variant="outline-dark"
                   className="fw-semibold px-4 ms-2"
@@ -208,22 +180,16 @@ export default function ProfileUI({ onSubscribeToggle }) {
               <Col md="auto" className="text-center text-md-end mt-3 mt-md-0">
                 <Row className="g-2">
                   <Col xs={4}>
-                    <div>
-                      <h6 className="fw-bold mb-0">{profile.postsCount}</h6>
-                      <small className="text-muted">Posts</small>
-                    </div>
+                    <h6 className="fw-bold mb-0">{profile.postsCount}</h6>
+                    <small className="text-muted">Posts</small>
                   </Col>
                   <Col xs={4}>
-                    <div>
-                      <h6 className="fw-bold mb-0">{profile.likesCount}</h6>
-                      <small className="text-muted">Likes</small>
-                    </div>
+                    <h6 className="fw-bold mb-0">{profile.likesCount}</h6>
+                    <small className="text-muted">Likes</small>
                   </Col>
                   <Col xs={4}>
-                    <div>
-                      <h6 className="fw-bold mb-0">{profile.followersCount}</h6>
-                      <small className="text-muted">Followers</small>
-                    </div>
+                    <h6 className="fw-bold mb-0">{profile.followersCount}</h6>
+                    <small className="text-muted">Followers</small>
                   </Col>
                 </Row>
               </Col>
@@ -232,16 +198,13 @@ export default function ProfileUI({ onSubscribeToggle }) {
           </Card.Body>
         </Card>
 
-        {/* Gallery Section (unchanged) */}
         <Card className="shadow-sm border-0 rounded-4">
           <Card.Body>
             <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3">
-              <h4 className="fw-bold mb-2 mb-md-0 text-center text-md-start">
-                Gallery
-              </h4>
+              <h4 className="fw-bold mb-2 mb-md-0 text-center text-md-start">Gallery</h4>
 
               {availableTags.length > 1 && (
-                <div className="d-flex align-items-center justify-content-center justify-content-md-end">
+                <div className="d-flex align-items-center">
                   <span className="me-2 fw-semibold">Filter by tag:</span>
                   <select
                     className="form-select form-select-sm w-auto"
@@ -259,9 +222,7 @@ export default function ProfileUI({ onSubscribeToggle }) {
             </div>
 
             {filteredGallery.length === 0 ? (
-              <p className="text-muted text-center">
-                No projects for this tag yet. Try another one.
-              </p>
+              <p className="text-muted text-center">No projects for this tag yet.</p>
             ) : (
               <Row className="g-4">
                 {filteredGallery.map((item) => (
