@@ -32,7 +32,7 @@ export default function FirebaseProvider({ children }) {
     }
   }, []);
 
-  const createPost = async ({ imageFile, videoLink, text, tags }) => {
+  const createPost = async ({ imageFile, videoLink, text, cap, tags }) => {
     const currentUser = auth.currentUser;
     if (!currentUser) {
       alert("You must be logged in to create a post!");
@@ -67,6 +67,7 @@ export default function FirebaseProvider({ children }) {
       mediaData,                // base64 image or video URL
       mediaType,                // MIME type or "video/link"
       text,
+      cap,
       tags,
       createdAt: serverTimestamp(),
     });

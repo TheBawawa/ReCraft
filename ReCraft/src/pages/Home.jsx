@@ -3,6 +3,8 @@ import PostTemplate from "../components/PostTemplate";
 import { useFirebase } from "../components/context/FirebaseContext";
 import Navbar from "../components/NavBar";
 
+
+
 export default function Home() {
   const { allPosts } = useFirebase();
   const [searchText, setSearchText] = useState("");
@@ -40,7 +42,10 @@ export default function Home() {
         ) : (
           filtered
             .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))
-            .map((post) => <PostTemplate key={post.id} post={post} />)
+            .map((post) =>
+            <PostTemplate key={post.id} post={post} />
+            
+            )
         )}
       </div>
     </div>
