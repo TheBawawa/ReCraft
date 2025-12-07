@@ -40,10 +40,11 @@ function NavBar({ onSearch }) {
         position: "fixed",
         top: 0,
         width: "100%",
-        zIndex: 1000,
         height: "60px",
         display: "flex",
         alignItems: "center",
+        overflow: "visible",
+        zIndex: 3000
       }}
     >
       <Link
@@ -96,7 +97,9 @@ function NavBar({ onSearch }) {
               borderRadius: "6px",
               padding: "10px",
               width: "150px",
-              zIndex: 2000,
+
+              /** ⭐ FIX 3 — ensure Settings is visible */
+              zIndex: 5000
             }}
           >
             {!user ? (
@@ -125,6 +128,16 @@ function NavBar({ onSearch }) {
                 >
                   My Profile
                 </p>
+
+                {/** ⭐ ADDED — this was missing! */}
+                <p
+                  className="dropdown-item"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => navigate("/settings")}
+                >
+                  Settings
+                </p>
+
                 <p
                   className="dropdown-item text-danger"
                   style={{ cursor: "pointer" }}
