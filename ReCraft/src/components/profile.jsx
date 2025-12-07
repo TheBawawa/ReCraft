@@ -1,9 +1,28 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Container, Card, Row, Col, Button, Image, Spinner } from "react-bootstrap";
-import { doc, getDoc, collection, getDocs, query, where, orderBy, updateDoc } from "firebase/firestore";
+import {
+  Container,
+  Card,
+  Row,
+  Col,
+  Button,
+  Image,
+  Spinner,
+} from "react-bootstrap";
+import {
+  doc,
+  getDoc,
+  collection,
+  getDocs,
+  query,
+  where,
+  orderBy,
+  updateDoc,
+} from "firebase/firestore";
 import { db, storage } from "../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
+const STORAGE_KEY = "savedPosts";
 
 const DEMO_PROFILE = (uid) => ({
   id: uid,
@@ -18,10 +37,30 @@ const DEMO_PROFILE = (uid) => ({
 });
 
 const DEMO_GALLERY = [
-  { id: "p1", imageUrl: "https://picsum.photos/seed/plastic/600/400", title: "Bottle Pencil Holder", tags: ["Plastic", "Paper"] },
-  { id: "p2", imageUrl: "https://picsum.photos/seed/paper/600/400", title: "Newspaper Gift Bag", tags: ["Paper"] },
-  { id: "p3", imageUrl: "https://picsum.photos/seed/glass/600/400", title: "Glass Jar Lantern", tags: ["Glass", "Metal"] },
-  { id: "p4", imageUrl: "https://picsum.photos/seed/fabric/600/400", title: "T-shirt Tote Bag", tags: ["Fabric"] },
+  {
+    id: "p1",
+    imageUrl: "https://picsum.photos/seed/plastic/600/400",
+    title: "Bottle Pencil Holder",
+    tags: ["Plastic", "Paper"],
+  },
+  {
+    id: "p2",
+    imageUrl: "https://picsum.photos/seed/paper/600/400",
+    title: "Newspaper Gift Bag",
+    tags: ["Paper"],
+  },
+  {
+    id: "p3",
+    imageUrl: "https://picsum.photos/seed/glass/600/400",
+    title: "Glass Jar Lantern",
+    tags: ["Glass", "Metal"],
+  },
+  {
+    id: "p4",
+    imageUrl: "https://picsum.photos/seed/fabric/600/400",
+    title: "T-shirt Tote Bag",
+    tags: ["Fabric"],
+  },
 ];
 
 export default function ProfileUI() {
@@ -33,6 +72,8 @@ export default function ProfileUI() {
   const [gallery, setGallery] = useState([]);
   const [subscribed, setSubscribed] = useState(false);
   const [selectedTag, setSelectedTag] = useState("All");
+
+  const [savedPosts, setSavedPosts] = useState([]);
 
   async function fetchProfile(userId) {
     try {
@@ -61,7 +102,11 @@ export default function ProfileUI() {
   async function fetchGallery(userId) {
     try {
       const postsRef = collection(db, "posts");
-      const q = query(postsRef, where("userId", "==", userId), orderBy("createdAt", "desc"));
+      const q = query(
+        postsRef,
+        where("userId", "==", userId),
+        orderBy("createdAt", "desc")
+      );
       const snapshot = await getDocs(q);
 
       if (snapshot.empty) return DEMO_GALLERY;
@@ -91,6 +136,20 @@ export default function ProfileUI() {
     })();
   }, [uid]);
 
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) {
+        setSavedPosts([]);
+        return;
+      }
+      const list = JSON.parse(raw);
+      setSavedPosts(Array.isArray(list) ? list : []);
+    } catch {
+      setSavedPosts([]);
+    }
+  }, []);
+
   async function handlePfpChange(file) {
     if (!file) return;
     const storageRef = ref(storage, `avatars/${uid}`);
@@ -101,26 +160,42 @@ export default function ProfileUI() {
   }
 
   const availableTags = ["All", ...new Set(gallery.flatMap((i) => i.tags || []))];
-  const filteredGallery = selectedTag === "All" ? gallery : gallery.filter((i) => (i.tags || []).includes(selectedTag));
+  const filteredGallery =
+    selectedTag === "All"
+      ? gallery
+      : gallery.filter((i) => (i.tags || []).includes(selectedTag));
 
-  if (loading) {
+  if (loading || !profile) {
     return (
-      <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #89d957 0%, #1b9aaa 100%)" }}
-           className="d-flex align-items-center justify-content-center">
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "linear-gradient(135deg, #89d957 0%, #1b9aaa 100%)",
+        }}
+        className="d-flex align-items-center justify-content-center"
+      >
         <Spinner animation="border" role="status" variant="light" />
       </div>
     );
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #89d957 0%, #1b9aaa 100%)", padding: "40px 0" }}>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "linear-gradient(135deg, #89d957 0%, #1b9aaa 100%)",
+        padding: "40px 0",
+      }}
+    >
       <Container>
         <Card className="shadow-lg border-0 rounded-4 mb-5">
           <Card.Body>
             <Row className="align-items-center text-center text-md-start">
-
               <Col xs={12} md="auto" className="mb-3 mb-md-0">
-                <div className="position-relative d-inline-block" style={{ width: "120px", height: "120px" }}>
+                <div
+                  className="position-relative d-inline-block"
+                  style={{ width: "120px", height: "120px" }}
+                >
                   <Image
                     src={profile.avatarUrl || "https://via.placeholder.com/120"}
                     alt="avatar"
@@ -193,15 +268,16 @@ export default function ProfileUI() {
                   </Col>
                 </Row>
               </Col>
-
             </Row>
           </Card.Body>
         </Card>
 
-        <Card className="shadow-sm border-0 rounded-4">
+        <Card className="shadow-sm border-0 rounded-4 mb-4">
           <Card.Body>
             <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3">
-              <h4 className="fw-bold mb-2 mb-md-0 text-center text-md-start">Gallery</h4>
+              <h4 className="fw-bold mb-2 mb-md-0 text-center text-md-start">
+                Gallery
+              </h4>
 
               {availableTags.length > 1 && (
                 <div className="d-flex align-items-center">
@@ -222,7 +298,9 @@ export default function ProfileUI() {
             </div>
 
             {filteredGallery.length === 0 ? (
-              <p className="text-muted text-center">No projects for this tag yet.</p>
+              <p className="text-muted text-center">
+                No projects for this tag yet.
+              </p>
             ) : (
               <Row className="g-4">
                 {filteredGallery.map((item) => (
@@ -234,6 +312,63 @@ export default function ProfileUI() {
                         className="img-fluid"
                         style={{ height: "200px", objectFit: "cover" }}
                       />
+                    </Card>
+                  </Col>
+                ))}
+              </Row>
+            )}
+          </Card.Body>
+        </Card>
+
+        <Card className="shadow-sm border-0 rounded-4">
+          <Card.Body>
+            <h4 className="fw-bold mb-3 text-center text-md-start">
+              Saved Posts
+            </h4>
+
+            {savedPosts.length === 0 ? (
+              <p className="text-muted text-center">
+                You haven&apos;t saved any posts yet.
+              </p>
+            ) : (
+              <Row className="g-4">
+                {savedPosts.map((item) => (
+                  <Col key={item.id} xs={12} sm={6} md={4}>
+                    <Card className="border-0 shadow-sm rounded-4 overflow-hidden">
+                      {item.mediaType?.startsWith("image/") ||
+                      (!item.mediaType && item.mediaData) ? (
+                        <Card.Img
+                          src={item.mediaData}
+                          alt={item.text || "Saved post"}
+                          className="img-fluid"
+                          style={{ height: "200px", objectFit: "cover" }}
+                        />
+                      ) : (
+                        <Card.Body>
+                          <Card.Title className="fs-6">
+                            {item.text || "Saved post"}
+                          </Card.Title>
+                        </Card.Body>
+                      )}
+                      {item.tags && item.tags.length > 0 && (
+                        <Card.Footer>
+                          {item.tags.map((tag) => (
+                            <span
+                              key={tag}
+                              style={{
+                                backgroundColor: "#1b9aaa",
+                                color: "#fff",
+                                padding: "2px 8px",
+                                borderRadius: "10px",
+                                marginRight: "6px",
+                                fontSize: "0.75rem",
+                              }}
+                            >
+                              #{tag}
+                            </span>
+                          ))}
+                        </Card.Footer>
+                      )}
                     </Card>
                   </Col>
                 ))}

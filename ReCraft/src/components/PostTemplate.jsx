@@ -1,125 +1,209 @@
-import React, { useState } from "react";
-import { auth, db } from "../firebase";
-import { doc, updateDoc, arrayUnion } from "firebase/firestore";
+import React, { useEffect, useState } from "react";
 
-//YouTube URL
+const STORAGE_KEY = "savedPosts";
+
+// YouTube
 const getYouTubeEmbedUrl = (url) => {
   if (!url) return null;
-  const watch = url.match(/[?&]v=([^&]+)/);
-  if (watch) return `https://www.youtube.com/embed/${watch[1]}`;
 
-  const short = url.match(/youtu\.be\/([^?]+)/);
-  if (short) return `https://www.youtube.com/embed/${short[1]}`;
+  const watchMatch = url.match(/[?&]v=([^&]+)/);
+  if (watchMatch) return `https://www.youtube.com/embed/${watchMatch[1]}`;
 
-  return url.includes("/embed/") ? url : null;
+  const shortMatch = url.match(/youtu\.be\/([^?]+)/);
+  if (shortMatch) return `https://www.youtube.com/embed/${shortMatch[1]}`;
+
+  if (url.includes("/embed/")) return url;
+
+  return null;
 };
 
 export default function PostTemplate({ post }) {
   if (!post) return null;
 
   const { id, mediaData, mediaType, text, tags, userId, createdAt } = post;
+
   const [saved, setSaved] = useState(false);
 
-  // SAVE POST
-  const handleSave = async () => {
-    const user = auth.currentUser;
-    if (!user) return alert("Please login first!");
-
-    const userRef = doc(db, "users", user.uid);
-    await updateDoc(userRef, {
-      savedPosts: arrayUnion(id),
-    });
-
-    setSaved(true);
-    alert("Saved!");
-  };
-
-  // SHARE POST
-  const handleShare = async () => {
+  useEffect(() => {
     try {
-      await navigator.share({
-        title: "ReCraft Project",
-        text: text,
-        url: window.location.href,
-      });
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const list = JSON.parse(raw);
+      setSaved(list.some((p) => p.id === id));
     } catch {
-      navigator.clipboard.writeText(window.location.href);
-      alert("Link copied to clipboard!");
+    }
+  }, [id]);
+
+  // Save / Saved
+  const handleToggleSave = () => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      const list = raw ? JSON.parse(raw) : [];
+
+      let next;
+      if (saved) {
+        next = list.filter((p) => p.id !== id);
+      } else {
+
+        const item = {
+          id,
+          mediaData,
+          mediaType,
+          text,
+          tags: tags || [],
+          userId,
+          createdAt: createdAt?.seconds || null,
+        };
+        next = [...list.filter((p) => p.id !== id), item];
+      }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      setSaved(!saved);
+    } catch (e) {
+      console.error("Save failed", e);
+      alert("Saving failed (local demo only).");
     }
   };
 
+  const handleShare = async () => {
+    const url = `${window.location.origin}/post/${id || ""}`;
+    const textShare = text || "Check out this ReCraft project!";
+
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: "ReCraft project", text: textShare, url });
+      } else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(url);
+        alert("Link copied to clipboard!");
+      } else {
+        window.prompt("Copy this link:", url);
+      }
+    } catch (e) {
+      console.error("Share error", e);
+    }
+  };
+
+  const dateText = createdAt?.toDate
+    ? createdAt.toDate().toLocaleDateString()
+    : createdAt
+    ? new Date(createdAt * 1000).toLocaleDateString()
+    : "";
+
   return (
     <div
+      id="MainPost-Box"
+      className="post-box mt-4"
       style={{
-        width: "70%",
-        margin: "30px auto",
-        background: "white",
-        borderRadius: "14px",
-        padding: "20px",
-        boxShadow: "0px 2px 10px rgba(0,0,0,0.15)",
+        backgroundColor: "#F8FFE5",
+        width: "75%",
+        marginLeft: "auto",
+        marginRight: "auto",
+        border: "5px solid black",
+        marginBottom: "40px",
+        borderRadius: "16px",
+        overflow: "hidden",
+        textAlign: "center",
       }}
     >
-      {/* Media */}
       {mediaData && (
-        <>
+        <div style={{ padding: "20px" }}>
           {mediaType === "video/link" ? (
-            <iframe
-              width="100%"
-              height="350"
-              src={getYouTubeEmbedUrl(mediaData)}
-              style={{ borderRadius: "12px" }}
-              allowFullScreen
+            (() => {
+              const embedUrl = getYouTubeEmbedUrl(mediaData);
+              if (embedUrl) {
+                return (
+                  <iframe
+                    id="MM-Img"
+                    width="100%"
+                    height="400"
+                    src={embedUrl}
+                    title="Video"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    style={{ maxWidth: "900px", borderRadius: "8px" }}
+                  />
+                );
+              }
+              return (
+                <a
+                  href={mediaData}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-primary"
+                >
+                  Watch Video
+                </a>
+              );
+            })()
+          ) : mediaType?.startsWith("video/") ? (
+            <video
+              id="MM-Img"
+              src={mediaData}
+              controls
+              style={{ maxWidth: "900px", width: "100%", borderRadius: "8px" }}
             />
           ) : (
             <img
+              id="MM-Img"
               src={mediaData}
-              alt="post"
-              style={{ width: "100%", borderRadius: "12px" }}
+              alt="Post Media"
+              style={{ maxWidth: "900px", width: "100%", borderRadius: "8px" }}
             />
           )}
-        </>
+        </div>
       )}
 
-      {/* text */}
-      <h4 className="mt-3">{text}</h4>
+      {text && (
+        <p className="post-name" style={{ fontSize: "1.1rem", padding: "0 20px" }}>
+          {text}
+        </p>
+      )}
 
-      {/* tags */}
-      {tags?.length > 0 &&
-        tags.map((t) => (
-          <span
-            key={t}
-            style={{
-              background: "#1b9aaa",
-              color: "white",
-              padding: "4px 10px",
-              borderRadius: "6px",
-              marginRight: "6px",
-              fontSize: "0.85rem",
-            }}
+      {tags && tags.length > 0 && (
+        <div style={{ marginTop: "10px" }}>
+          {tags.map((tag) => (
+            <span
+              key={tag}
+              style={{
+                backgroundColor: "#1b9aaa",
+                color: "#fff",
+                padding: "4px 10px",
+                borderRadius: "12px",
+                marginRight: "8px",
+                fontSize: "0.9rem",
+              }}
+            >
+              #{tag}
+            </span>
+          ))}
+        </div>
+      )}
+
+      <div
+        style={{
+          marginTop: "16px",
+          marginBottom: "16px",
+          fontSize: "0.85rem",
+          color: "#555",
+        }}
+      >
+        <div>
+          Posted by: {userId || "unknown user"}
+          {dateText ? ` on ${dateText}` : ""}
+        </div>
+
+        <div style={{ marginTop: "10px" }}>
+          <button
+            className="btn btn-sm btn-outline-dark me-2"
+            onClick={handleToggleSave}
           >
-            #{t}
-          </span>
-        ))}
-
-      {/* buttons */}
-      <div className="mt-3">
-        <button
-          className="btn btn-secondary me-2"
-          onClick={handleSave}
-          disabled={saved}
-        >
-          {saved ? "Saved" : "Save"}
-        </button>
-
-        <button className="btn btn-info" onClick={handleShare}>
-          Share
-        </button>
+            {saved ? "Saved" : "Save"}
+          </button>
+          <button className="btn btn-sm btn-outline-secondary" onClick={handleShare}>
+            Share
+          </button>
+        </div>
       </div>
-
-      <small className="text-muted">
-        Posted by {userId} on{" "}
-        {createdAt?.toDate ? createdAt.toDate().toLocaleDateString() : ""}
-      </small>
     </div>
   );
 }
