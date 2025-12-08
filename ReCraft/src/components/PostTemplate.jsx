@@ -8,9 +8,9 @@ import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import { ButtonGroup } from "react-bootstrap";
 
-/* -----------------------------
-   YOUTUBE EMBED URL HELPER
------------------------------ */
+const STORAGE_KEY = "savedPosts";
+
+
 const getYouTubeEmbedUrl = (url) => {
   if (!url) return null;
 
@@ -50,9 +50,7 @@ export default function PostTemplate({ post }) {
 
   const isOwner = currentUser && currentUser.uid === userId;
 
-  /* -----------------------------
-     GET USERNAME FROM FIRESTORE
-  ----------------------------- */
+ 
   useEffect(() => {
     const fetchUsername = async () => {
       try {
@@ -70,71 +68,53 @@ export default function PostTemplate({ post }) {
     if (userId) fetchUsername();
   }, [userId]);
 
-  /* -----------------------------
-     CHECK IF POST IS SAVED (LOCAL)
-  ----------------------------- */
+  
   useEffect(() => {
-    const raw = localStorage.getItem("savedPosts");
-    const list = raw ? JSON.parse(raw) : [];
-    setSaved(list.some((p) => p.id === id));
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const list = JSON.parse(raw);
+      setSaved(list.some((p) => p.id === id));
+    } catch {
+    }
   }, [id]);
 
-  /* -----------------------------
-     SAVE POST
-  ----------------------------- */
-  const handleSave = async (e) => {
-    e.stopPropagation();
+ 
+  const handleToggleSave = () => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      const list = raw ? JSON.parse(raw) : [];
 
-    if (currentUser) {
-      // SAVE TO FIRESTORE
-      try {
-        const userRef = doc(db, "users", currentUser.uid);
-        await updateDoc(userRef, { savedPosts: arrayUnion(id) });
-        setSaved(true);
-        alert("Saved!");
-      } catch (error) {
-        console.error(error);
-        alert("Failed to save post.");
+      let next;
+      if (saved) {
+        next = list.filter((p) => p.id !== id);
+      } else {
+
+        const item = {
+          id,
+          mediaData,
+          mediaType,
+          text,
+          tags: tags || [],
+          userId,
+          createdAt: createdAt?.seconds || null,
+        };
+        next = [...list.filter((p) => p.id !== id), item];
       }
-    } else {
-      // SAVE LOCALLY
-      try {
-        const raw = localStorage.getItem("savedPosts");
-        const list = raw ? JSON.parse(raw) : [];
-
-        let next;
-        if (saved) {
-          next = list.filter((p) => p.id !== id);
-        } else {
-          next = [
-            ...list.filter((p) => p.id !== id),
-            {
-              id,
-              mediaData,
-              mediaType,
-              text,
-              tags,
-              userId,
-              createdAt: createdAt?.seconds || null,
-            },
-          ];
-        }
-
-        localStorage.setItem("savedPosts", JSON.stringify(next));
-        setSaved(!saved);
-      } catch (error) {
-        console.error(error);
-      }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      setSaved(!saved);
+    } catch (e) {
+      console.error("Save failed", e);
+      alert("Saving failed (local demo only).");
     }
   };
 
   /* -----------------------------
      SHARE POST
   ----------------------------- */
-  const handleShare = async (e) => {
-    e.stopPropagation();
-
-    const url = `${window.location.origin}/post/${id}`;
+  const handleShare = async () => {
+    const url = `${window.location.origin}/post/${id || ""}`;
+    
     const textShare = text || "Check out this ReCraft project!";
 
     try {
@@ -146,8 +126,8 @@ export default function PostTemplate({ post }) {
       } else {
         window.prompt("Copy this link:", url);
       }
-    } catch (error) {
-      console.error(error);
+    } catch (e) {
+      console.error("Share error", e);
     }
   };
 
@@ -172,15 +152,17 @@ export default function PostTemplate({ post }) {
           boxShadow: "0px 2px 10px rgba(0,0,0,0.15)",
           cursor: "pointer",
         }}
-        onClick={() => setShow(true)}
+        
       >
         {/* MEDIA HANDLING */}
         {mediaData && (
           mediaType === "video/link" ? (
             <iframe
+            id="MM-Img"
               width="100%"
               height="200px"
               src={getYouTubeEmbedUrl(mediaData)}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               style={{ borderRadius: "12px" }}
               allowFullScreen
               title="video"
@@ -195,17 +177,12 @@ export default function PostTemplate({ post }) {
             <img
               src={mediaData}
               alt="post"
-              style={{
-                width: "100%",
-                maxHeight: "200px",
-                borderRadius: "12px",
-                objectFit: "cover",
-              }}
-            />
+              style={{width: "100%", maxHeight: "200px", borderRadius: "12px", objectFit: "cover",}}
+           />
           )
         )}
 
-        <h4 className="mt-3">{text}</h4>
+        <h4 className="mt-3" onClick={() => setShow(true)}>{text}</h4>
 
         {/* TAGS */}
         {tags?.length > 0 &&
@@ -229,7 +206,7 @@ export default function PostTemplate({ post }) {
         <div className="mt-3">
           <button
             className="btn btn-secondary me-2"
-            onClick={handleSave}
+            onClick={handleToggleSave}
             disabled={saved}
           >
             {saved ? "Saved" : "Save"}
@@ -247,28 +224,24 @@ export default function PostTemplate({ post }) {
 
       {/* MODAL */}
       <Modal show={show} onHide={() => setShow(false)} size="xl" centered style={ {marginTop: "4%",}}>
-        <ButtonGroup style={ {marginTop: "1%",}}>
+        <div style={{marginLeft: "auto", marginLeft: "90%", width: "100%"}}>
+          <ButtonGroup>
           {isOwner && (
-            <Button
-              style={{
-                marginTop: "5%",
-                marginLeft: "70%",
-                width: "6%",
-              }}
+            <Button style={{ marginTop: "5%", width: "100%"}}
               onClick={() => navigate(`/edit-post/${id}`, { state: { post } })}
-            >
-              Edit
+            >Edit
             </Button>
           )}
 
           <Button
             variant="secondary"
             onClick={() => setShow(false)}
-            style={{  marginLeft: "1%", width: "4%" }}
+            style={{  marginTop: "5%", marginLeft: "1%", width: "100%" }}
           >
             X
           </Button>
-        </ButtonGroup>
+          </ButtonGroup>
+       </div>
 
         <Modal.Body>
           <FeedPost
