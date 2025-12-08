@@ -55,7 +55,7 @@ Our app facilitates and enhances the search for DIY (Do it yourself) projects. I
 
 ## Final delivery
 
-* [Final presentation](https://www.canva.com/design/DAG69StTSu4/NU8lRw4aPiOoAmMXfukVUA/edit?utm_content=DAG69StTSu4&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
+* [Final presentation]()
 * [Poster]()
 * [Process description]()
 
