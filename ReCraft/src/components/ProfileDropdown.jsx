@@ -33,6 +33,7 @@ function ProfileDropdown() {
         borderRadius: "8px",
         width: "150px",
         textAlign: "center",
+        zIndex: 5000,
       }}
     >
       {!user ? (
