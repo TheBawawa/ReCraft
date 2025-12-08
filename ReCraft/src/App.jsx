@@ -12,6 +12,7 @@ import ProfileUI from "./components/profile";
 import Settings from "./components/Settings";
 import PostCreation from "./components/PostCreation";
 import FirebaseProvider from "./components/context/FirebaseContext";
+import EditPost from "./components/EditPost";
 
 function App() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -28,6 +29,7 @@ function App() {
         <Route path="/profile/:uid" element={<ProfileUI />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/create-post" element={<PostCreation />} />
+        <Route path="/edit-post/:id" element={<EditPost />} />
       </Routes>
     </FirebaseProvider>
   );

@@ -1,8 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { auth, db } from "../firebase";
+import { doc, updateDoc, arrayUnion, getDoc } from "firebase/firestore";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import FeedPost from "./FeedPost";
+import EditPost from "./EditPost";
 
-const STORAGE_KEY = "savedPosts";
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
+import { ButtonGroup } from "react-bootstrap";
 
-// YouTube
+// YouTube URL embed helper
 const getYouTubeEmbedUrl = (url) => {
   if (!url) return null;
 
@@ -20,54 +28,67 @@ const getYouTubeEmbedUrl = (url) => {
 export default function PostTemplate({ post }) {
   if (!post) return null;
 
-  const { id, mediaData, mediaType, text, tags, userId, createdAt } = post;
-
+  const { id, mediaData, mediaType, text, tags, userId, createdAt, cap } = post;
   const [saved, setSaved] = useState(false);
+  const [show, setShow] = useState(false);
+  const [username, setUsername] = useState(userId); 
 
+  // GET USERNAME
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return;
-      const list = JSON.parse(raw);
-      setSaved(list.some((p) => p.id === id));
-    } catch {
-    }
-  }, [id]);
+    const fetchUsername = async () => {
+      try {
+        const userRef = doc(db, "users", userId);
+        const userSnap = await getDoc(userRef);
 
-  // Save / Saved
-  const handleToggleSave = () => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      const list = raw ? JSON.parse(raw) : [];
-
-      let next;
-      if (saved) {
-        next = list.filter((p) => p.id !== id);
-      } else {
-
-        const item = {
-          id,
-          mediaData,
-          mediaType,
-          text,
-          tags: tags || [],
-          userId,
-          createdAt: createdAt?.seconds || null,
-        };
-        next = [...list.filter((p) => p.id !== id), item];
+        if (userSnap.exists()) {
+          const data = userSnap.data();
+          setUsername(data?.username || userId);
+        }
+      } catch (error) {
+        console.error("Error fetching username:", error);
       }
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-      setSaved(!saved);
-    } catch (e) {
-      console.error("Save failed", e);
-      alert("Saving failed (local demo only).");
+    };
+
+    if (userId) fetchUsername();
+  }, [userId]);
+
+  // SAVE POST
+  const handleSave = async (e) => {
+    e.stopPropagation();
+    if (currentUser) {
+      try {
+        const userRef = doc(db, "users", currentUser.uid);
+        await updateDoc(userRef, { savedPosts: arrayUnion(id) });
+        setSaved(true);
+        alert("Saved!");
+      } catch (error) {
+        console.error(error);
+        alert("Failed to save post.");
+      }
+    } else {
+      try {
+        const raw = localStorage.getItem("savedPosts");
+        const list = raw ? JSON.parse(raw) : [];
+        let next;
+        if (saved) {
+          next = list.filter(p => p.id !== id);
+        } else {
+          next = [...list.filter(p => p.id !== id), { id, mediaData, mediaType, text, tags, userId, createdAt: createdAt?.seconds || null }];
+        }
+        localStorage.setItem("savedPosts", JSON.stringify(next));
+        setSaved(!saved);
+      } catch (error) {
+        console.error(error);
+        alert("Saving failed.");
+      }
     }
   };
 
-  const handleShare = async () => {
-    const url = `${window.location.origin}/post/${id || ""}`;
+  // Share post
+  const handleShare = async (e) => {
+    e.stopPropagation();
+    const url = `${window.location.origin}/post/${id}`;
     const textShare = text || "Check out this ReCraft project!";
-
     try {
       if (navigator.share) {
         await navigator.share({ title: "ReCraft project", text: textShare, url });
@@ -77,10 +98,13 @@ export default function PostTemplate({ post }) {
       } else {
         window.prompt("Copy this link:", url);
       }
-    } catch (e) {
-      console.error("Share error", e);
+    } catch (error) {
+      console.error(error);
     }
   };
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
 
   const dateText = createdAt?.toDate
     ? createdAt.toDate().toLocaleDateString()
@@ -89,121 +113,101 @@ export default function PostTemplate({ post }) {
     : "";
 
   return (
-    <div
-      id="MainPost-Box"
-      className="post-box mt-4"
-      style={{
-        backgroundColor: "#F8FFE5",
-        width: "75%",
-        marginLeft: "auto",
-        marginRight: "auto",
-        border: "5px solid black",
-        marginBottom: "40px",
-        borderRadius: "16px",
-        overflow: "hidden",
-        textAlign: "center",
-      }}
-    >
-      {mediaData && (
-        <div style={{ padding: "20px" }}>
-          {mediaType === "video/link" ? (
-            (() => {
-              const embedUrl = getYouTubeEmbedUrl(mediaData);
-              if (embedUrl) {
-                return (
-                  <iframe
-                    id="MM-Img"
-                    width="100%"
-                    height="400"
-                    src={embedUrl}
-                    title="Video"
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    style={{ maxWidth: "900px", borderRadius: "8px" }}
-                  />
-                );
-              }
-              return (
-                <a
-                  href={mediaData}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-primary"
-                >
-                  Watch Video
-                </a>
-              );
-            })()
+    <>
+      <div
+        style={{
+          width: "350px",
+          margin: "15px",
+          background: "white",
+          borderRadius: "14px",
+          padding: "20px",
+          boxShadow: "0px 2px 10px rgba(0,0,0,0.15)",
+          cursor: "pointer",
+        }}
+        onClick={handleShow}
+      >
+        {/* Media */}
+        {mediaData && (
+          mediaType === "video/link" ? (
+            <iframe
+              width="100%"
+              height="200px"
+              src={getYouTubeEmbedUrl(mediaData)}
+              style={{ borderRadius: "12px" }}
+              allowFullScreen
+              title="video"
+            />
           ) : mediaType?.startsWith("video/") ? (
             <video
-              id="MM-Img"
               src={mediaData}
               controls
-              style={{ maxWidth: "900px", width: "100%", borderRadius: "8px" }}
+              style={{ width: "100%", maxHeight: "200px", borderRadius: "12px" }}
             />
           ) : (
             <img
-              id="MM-Img"
               src={mediaData}
-              alt="Post Media"
-              style={{ maxWidth: "900px", width: "100%", borderRadius: "8px" }}
+              alt="post"
+              style={{ width: "100%", maxHeight: "200px", borderRadius: "12px", objectFit: "cover" }}
             />
-          )}
-        </div>
-      )}
+          )
+        )}
 
-      {text && (
-        <p className="post-name" style={{ fontSize: "1.1rem", padding: "0 20px" }}>
-          {text}
-        </p>
-      )}
+        {/* Text */}
+        <h4 className="mt-3">{text}</h4>
 
-      {tags && tags.length > 0 && (
-        <div style={{ marginTop: "10px" }}>
-          {tags.map((tag) => (
-            <span
-              key={tag}
-              style={{
-                backgroundColor: "#1b9aaa",
-                color: "#fff",
-                padding: "4px 10px",
-                borderRadius: "12px",
-                marginRight: "8px",
-                fontSize: "0.9rem",
-              }}
-            >
-              #{tag}
-            </span>
-          ))}
-        </div>
-      )}
-
-      <div
-        style={{
-          marginTop: "16px",
-          marginBottom: "16px",
-          fontSize: "0.85rem",
-          color: "#555",
-        }}
-      >
-        <div>
-          Posted by: {userId || "unknown user"}
-          {dateText ? ` on ${dateText}` : ""}
-        </div>
-
-        <div style={{ marginTop: "10px" }}>
-          <button
-            className="btn btn-sm btn-outline-dark me-2"
-            onClick={handleToggleSave}
+        {/* Tags */}
+        {tags?.length > 0 && tags.map(t => (
+          <span
+            key={t}
+            style={{
+              background: "#1b9aaa",
+              color: "white",
+              padding: "4px 10px",
+              borderRadius: "6px",
+              marginRight: "6px",
+              fontSize: "0.85rem",
+            }}
           >
+            #{t}
+          </span>
+        ))}
+
+        {/* Buttons */}
+        <div className="mt-3">
+          <button className="btn btn-secondary me-2" onClick={handleSave} disabled={saved}>
             {saved ? "Saved" : "Save"}
           </button>
-          <button className="btn btn-sm btn-outline-secondary" onClick={handleShare}>
-            Share
-          </button>
+          <button className="btn btn-info" onClick={handleShare}>Share</button>
         </div>
+
+        <small className="text-muted">
+          Posted by {username} on {dateText}
+        </small>
       </div>
-    </div>
+
+      <Modal show={show} onHide={handleClose} size="xl" style={{ border: "5px solid black" }}>
+        <ButtonGroup>
+          {isOwner && (
+            <Button
+              style={{ width: "4%", marginTop: "1%", marginLeft: "70%", marginRight: "0"}}
+              onClick={() => navigate(`/edit-post/${id}`, { state: { post } })}
+            >
+              Edit
+            </Button>
+          )}
+          <Button
+            variant="secondary"
+            onClick={handleClose}
+            style={{ width: "4%", marginTop: "1%", marginLeft: "1%", marginRight: "2%" }}
+          >
+            X
+          </Button>
+        </ButtonGroup>
+
+        <Modal.Body>
+          <FeedPost title={text} mediaDt={mediaData} mediaTp={mediaType} usName={username} likeCount={0} capT={cap} />
+        </Modal.Body>
+      </Modal>
+    </>
   );
 }

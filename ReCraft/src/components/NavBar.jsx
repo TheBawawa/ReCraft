@@ -2,9 +2,12 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { auth } from "../firebase";
+import Autocomplete from "./AutoComplete";
+const suggestions = ["Plastic Bottles", "Paper", "Plastic", "Plastic Bottles", "Soda Cans", "Platic Bags", "Tubs", "Jugs", "Aluminum Cans", "Steel Cans", "Containers", "Metal"];
 
 // Search bar
 function SearchBar({ onSearch }) {
+
   return (
     <input
       type="text"
@@ -55,7 +58,19 @@ function NavBar({ onSearch }) {
         ReCraft
       </Link>
 
-      <SearchBar onSearch={onSearch} />
+     <div style={{ marginLeft: "20px", width: "500px" }}>
+        <Autocomplete
+          suggestions={suggestions}
+          onSearch={onSearch}
+          placeholder="Search by text or tag..."
+          style={{
+            width: "100%",
+            padding: "8px 12px",
+            borderRadius: "6px",
+            border: "1px solid #aaa",
+          }}
+        />
+      </div>
 
       <div className="ms-auto me-3">
         <Link

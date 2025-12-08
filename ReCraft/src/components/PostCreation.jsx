@@ -17,6 +17,7 @@ export default function PostCreation() {
   const [imageFile, setImageFile] = useState(null);
   const [videoLink, setVideoLink] = useState("");
   const [text, setText] = useState("");
+  const [cap, setCaption] = useState("");
   const [tags, setTags] = useState([]);
 
   const handleTagToggle = (tag) => {
@@ -28,17 +29,18 @@ export default function PostCreation() {
       alert("You must be logged in to post!");
       return;
     }
-    if (!text && !imageFile && !videoLink) {
+    if (!text && !imageFile && !videoLink && !cap) {
       alert("Please add some text, an image, or a video link!");
       return;
     }
 
     // Pass both imageFile and videoLink to createPost
-    await createPost({ imageFile, videoLink, text, tags });
+    await createPost({ imageFile, videoLink, text, cap, tags });
     
     setImageFile(null);
     setVideoLink("");
     setText("");
+    setCaption("");
     setTags([]);
     alert("Post created successfully!");
     navigate("/"); // go to home
@@ -73,8 +75,13 @@ export default function PostCreation() {
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Post Information:</Form.Label>
-              <Form.Control as="textarea" rows={4} value={text} onChange={(e) => setText(e.target.value)} placeholder="Type your post content here..." />
+              <Form.Label>Post Title:</Form.Label>
+              <Form.Control size="lg" rows={4} value={text} onChange={(e) => setText(e.target.value)} placeholder="Type your post title here..." />
+            </Form.Group>
+            
+            <Form.Group className="mb-3">
+              <Form.Label>Post Caption:</Form.Label>
+              <Form.Control as="textarea" rows={4} value={cap} onChange={(e) => setCaption(e.target.value)} placeholder="Type your post caption here..." />
             </Form.Group>
 
             <Form.Group className="mb-3">
