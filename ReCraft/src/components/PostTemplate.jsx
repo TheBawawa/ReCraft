@@ -2,15 +2,15 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../firebase";
 import { doc, updateDoc, arrayUnion, getDoc } from "firebase/firestore";
-import 'bootstrap/dist/css/bootstrap.min.css';
+import "bootstrap/dist/css/bootstrap.min.css";
 import FeedPost from "./FeedPost";
-import EditPost from "./EditPost";
-
-import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
+import Modal from "react-bootstrap/Modal";
+import Button from "react-bootstrap/Button";
 import { ButtonGroup } from "react-bootstrap";
 
-// YouTube URL embed helper
+/* -----------------------------
+   YOUTUBE EMBED URL HELPER
+----------------------------- */
 const getYouTubeEmbedUrl = (url) => {
   if (!url) return null;
 
@@ -22,24 +22,42 @@ const getYouTubeEmbedUrl = (url) => {
 
   if (url.includes("/embed/")) return url;
 
-  return null;
+  return url; // fallback (prevents iframe src=null)
 };
 
+/* -----------------------------
+   COMPONENT
+----------------------------- */
 export default function PostTemplate({ post }) {
   if (!post) return null;
 
-  const { id, mediaData, mediaType, text, tags, userId, createdAt, cap } = post;
+  const navigate = useNavigate();
+  const currentUser = auth.currentUser;
+  const {
+    id,
+    mediaData,
+    mediaType,
+    text,
+    tags,
+    userId,
+    createdAt,
+    cap,
+  } = post;
+
   const [saved, setSaved] = useState(false);
   const [show, setShow] = useState(false);
-  const [username, setUsername] = useState(userId); 
+  const [username, setUsername] = useState(userId);
 
-  // GET USERNAME
+  const isOwner = currentUser && currentUser.uid === userId;
+
+  /* -----------------------------
+     GET USERNAME FROM FIRESTORE
+  ----------------------------- */
   useEffect(() => {
     const fetchUsername = async () => {
       try {
         const userRef = doc(db, "users", userId);
         const userSnap = await getDoc(userRef);
-
         if (userSnap.exists()) {
           const data = userSnap.data();
           setUsername(data?.username || userId);
@@ -52,10 +70,23 @@ export default function PostTemplate({ post }) {
     if (userId) fetchUsername();
   }, [userId]);
 
-  // SAVE POST
+  /* -----------------------------
+     CHECK IF POST IS SAVED (LOCAL)
+  ----------------------------- */
+  useEffect(() => {
+    const raw = localStorage.getItem("savedPosts");
+    const list = raw ? JSON.parse(raw) : [];
+    setSaved(list.some((p) => p.id === id));
+  }, [id]);
+
+  /* -----------------------------
+     SAVE POST
+  ----------------------------- */
   const handleSave = async (e) => {
     e.stopPropagation();
+
     if (currentUser) {
+      // SAVE TO FIRESTORE
       try {
         const userRef = doc(db, "users", currentUser.uid);
         await updateDoc(userRef, { savedPosts: arrayUnion(id) });
@@ -66,29 +97,46 @@ export default function PostTemplate({ post }) {
         alert("Failed to save post.");
       }
     } else {
+      // SAVE LOCALLY
       try {
         const raw = localStorage.getItem("savedPosts");
         const list = raw ? JSON.parse(raw) : [];
+
         let next;
         if (saved) {
-          next = list.filter(p => p.id !== id);
+          next = list.filter((p) => p.id !== id);
         } else {
-          next = [...list.filter(p => p.id !== id), { id, mediaData, mediaType, text, tags, userId, createdAt: createdAt?.seconds || null }];
+          next = [
+            ...list.filter((p) => p.id !== id),
+            {
+              id,
+              mediaData,
+              mediaType,
+              text,
+              tags,
+              userId,
+              createdAt: createdAt?.seconds || null,
+            },
+          ];
         }
+
         localStorage.setItem("savedPosts", JSON.stringify(next));
         setSaved(!saved);
       } catch (error) {
         console.error(error);
-        alert("Saving failed.");
       }
     }
   };
 
-  // Share post
+  /* -----------------------------
+     SHARE POST
+  ----------------------------- */
   const handleShare = async (e) => {
     e.stopPropagation();
+
     const url = `${window.location.origin}/post/${id}`;
     const textShare = text || "Check out this ReCraft project!";
+
     try {
       if (navigator.share) {
         await navigator.share({ title: "ReCraft project", text: textShare, url });
@@ -103,15 +151,15 @@ export default function PostTemplate({ post }) {
     }
   };
 
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
-
   const dateText = createdAt?.toDate
     ? createdAt.toDate().toLocaleDateString()
     : createdAt
     ? new Date(createdAt * 1000).toLocaleDateString()
     : "";
 
+  /* -----------------------------
+     RENDER
+  ----------------------------- */
   return (
     <>
       <div
@@ -124,9 +172,9 @@ export default function PostTemplate({ post }) {
           boxShadow: "0px 2px 10px rgba(0,0,0,0.15)",
           cursor: "pointer",
         }}
-        onClick={handleShow}
+        onClick={() => setShow(true)}
       >
-        {/* Media */}
+        {/* MEDIA HANDLING */}
         {mediaData && (
           mediaType === "video/link" ? (
             <iframe
@@ -147,37 +195,49 @@ export default function PostTemplate({ post }) {
             <img
               src={mediaData}
               alt="post"
-              style={{ width: "100%", maxHeight: "200px", borderRadius: "12px", objectFit: "cover" }}
+              style={{
+                width: "100%",
+                maxHeight: "200px",
+                borderRadius: "12px",
+                objectFit: "cover",
+              }}
             />
           )
         )}
 
-        {/* Text */}
         <h4 className="mt-3">{text}</h4>
 
-        {/* Tags */}
-        {tags?.length > 0 && tags.map(t => (
-          <span
-            key={t}
-            style={{
-              background: "#1b9aaa",
-              color: "white",
-              padding: "4px 10px",
-              borderRadius: "6px",
-              marginRight: "6px",
-              fontSize: "0.85rem",
-            }}
-          >
-            #{t}
-          </span>
-        ))}
+        {/* TAGS */}
+        {tags?.length > 0 &&
+          tags.map((t) => (
+            <span
+              key={t}
+              style={{
+                background: "#1b9aaa",
+                color: "white",
+                padding: "4px 10px",
+                borderRadius: "6px",
+                marginRight: "6px",
+                fontSize: "0.85rem",
+              }}
+            >
+              #{t}
+            </span>
+          ))}
 
-        {/* Buttons */}
+        {/* BUTTONS */}
         <div className="mt-3">
-          <button className="btn btn-secondary me-2" onClick={handleSave} disabled={saved}>
+          <button
+            className="btn btn-secondary me-2"
+            onClick={handleSave}
+            disabled={saved}
+          >
             {saved ? "Saved" : "Save"}
           </button>
-          <button className="btn btn-info" onClick={handleShare}>Share</button>
+
+          <button className="btn btn-info" onClick={handleShare}>
+            Share
+          </button>
         </div>
 
         <small className="text-muted">
@@ -185,27 +245,40 @@ export default function PostTemplate({ post }) {
         </small>
       </div>
 
-      <Modal show={show} onHide={handleClose} size="xl" style={{ border: "5px solid black" }}>
-        <ButtonGroup>
+      {/* MODAL */}
+      <Modal show={show} onHide={() => setShow(false)} size="xl" centered style={ {marginTop: "4%",}}>
+        <ButtonGroup style={ {marginTop: "1%",}}>
           {isOwner && (
             <Button
-              style={{ width: "4%", marginTop: "1%", marginLeft: "70%", marginRight: "0"}}
+              style={{
+                marginTop: "5%",
+                marginLeft: "70%",
+                width: "6%",
+              }}
               onClick={() => navigate(`/edit-post/${id}`, { state: { post } })}
             >
               Edit
             </Button>
           )}
+
           <Button
             variant="secondary"
-            onClick={handleClose}
-            style={{ width: "4%", marginTop: "1%", marginLeft: "1%", marginRight: "2%" }}
+            onClick={() => setShow(false)}
+            style={{  marginLeft: "1%", width: "4%" }}
           >
             X
           </Button>
         </ButtonGroup>
 
         <Modal.Body>
-          <FeedPost title={text} mediaDt={mediaData} mediaTp={mediaType} usName={username} likeCount={0} capT={cap} />
+          <FeedPost
+            title={text}
+            mediaDt={mediaData}
+            mediaTp={mediaType}
+            usName={username}
+            likeCount={0}
+            capT={cap}
+          />
         </Modal.Body>
       </Modal>
     </>

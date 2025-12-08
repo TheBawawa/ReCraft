@@ -115,7 +115,7 @@ export default function EditPost() {
         minHeight: "100vh",
         background: "linear-gradient(135deg, #89d957 0%, #1b9aaa 100%)",
         padding: "40px 0",
-        paddingTop:"7%"
+        paddingTop:"10%"
       }}
     >
       <Container>
