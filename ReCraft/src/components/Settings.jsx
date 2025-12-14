@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Container, Row, Col, Card, Form, Button, Alert } from "react-bootstrap";
-import { auth, db, storage } from "../firebase";
+import { Container, Row, Col, Card, Form, Button, Alert, Image } from "react-bootstrap";
+import { auth, db } from "../firebase";
 import { updatePassword, updateProfile } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 export default function Settings() {
   const user = auth.currentUser;
@@ -13,7 +12,8 @@ export default function Settings() {
   const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [newAvatar, setNewAvatar] = useState(null);
+  const [newAvatarFile, setNewAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -21,7 +21,11 @@ export default function Settings() {
 
   useEffect(() => {
     async function loadUser() {
-      if (!user) return;
+      if (!user) {
+        setError("You must be logged in to view settings.");
+        setLoading(false);
+        return;
+      }
 
       try {
         const docRef = doc(db, "users", user.uid);
@@ -29,6 +33,7 @@ export default function Settings() {
 
         if (snap.exists()) {
           setUsername(snap.data().username || "");
+          if (snap.data().avatarUrl) setAvatarPreview(snap.data().avatarUrl);
         }
 
         setName(user.displayName || "");
@@ -39,46 +44,72 @@ export default function Settings() {
 
       setLoading(false);
     }
+
     loadUser();
   }, [user]);
 
-  async function handleSave(e) {
+  const handleAvatarChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Preview the image
+    const reader = new FileReader();
+    reader.onload = () => setAvatarPreview(reader.result);
+    reader.readAsDataURL(file);
+
+    setNewAvatarFile(file);
+  };
+
+  const handleSave = async (e) => {
     e.preventDefault();
+    if (!user) return;
+
     setSaving(true);
     setError("");
     setSuccess("");
 
     try {
+      // Update display name
       if (name !== user.displayName) {
         await updateProfile(user, { displayName: name });
       }
 
+      // Update password
       if (newPassword) {
         await updatePassword(user, newPassword);
       }
 
-      // Avatar upload added
-      if (newAvatar) {
-        const storageRef = ref(storage, `avatars/${user.uid}`);
-        await uploadBytes(storageRef, newAvatar);
-        const downloadURL = await getDownloadURL(storageRef);
-
-        await updateProfile(user, { photoURL: downloadURL });
-
-        await updateDoc(doc(db, "users", user.uid), {
-          avatarUrl: downloadURL,
+      // Update avatar in Firestore only
+      let avatarUrl = avatarPreview;
+      if (newAvatarFile) {
+        // Convert image to Base64
+        const base64 = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(newAvatarFile);
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = (err) => reject(err);
         });
+
+        // Size check < 800 KB
+        const sizeInBytes = (base64.length * 3) / 4;
+        if (sizeInBytes > 800 * 1024) throw new Error("Image must be 800KB or less");
+
+        avatarUrl = base64;
       }
+
+      await updateDoc(doc(db, "users", user.uid), {
+        avatarUrl: avatarUrl || null,
+      });
 
       setSuccess("Settings updated!");
       setNewPassword("");
-      setNewAvatar(null);
+      setNewAvatarFile(null);
     } catch (err) {
-      setError(err.message || "Failed to update");
+      setError(err.message || "Failed to update settings");
     }
 
     setSaving(false);
-  }
+  };
 
   if (loading) {
     return (
@@ -101,7 +132,6 @@ export default function Settings() {
                 {success && <Alert variant="success">{success}</Alert>}
 
                 <Form onSubmit={handleSave}>
-
                   <Form.Group className="mb-3">
                     <Form.Label>Username</Form.Label>
                     <Form.Control type="text" value={username} disabled />
@@ -109,7 +139,11 @@ export default function Settings() {
 
                   <Form.Group className="mb-3">
                     <Form.Label>Full Name</Form.Label>
-                    <Form.Control type="text" value={name} onChange={(e) => setName(e.target.value)} />
+                    <Form.Control
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                    />
                   </Form.Group>
 
                   <Form.Group className="mb-3">
@@ -133,20 +167,29 @@ export default function Settings() {
                     onChange={() => setShowPassword(!showPassword)}
                   />
 
-                  {/* Avatar Upload */}
                   <Form.Group className="mb-4">
                     <Form.Label>Profile Picture</Form.Label>
                     <Form.Control
                       type="file"
                       accept="image/*"
-                      onChange={(e) => setNewAvatar(e.target.files[0])}
+                      onChange={handleAvatarChange}
                     />
                   </Form.Group>
+
+                  {avatarPreview && (
+                    <div className="text-center mb-3">
+                      <Image
+                        src={avatarPreview}
+                        roundedCircle
+                        style={{ width: "100px", height: "100px", objectFit: "cover" }}
+                        alt="Avatar Preview"
+                      />
+                    </div>
+                  )}
 
                   <Button type="submit" className="w-100" disabled={saving}>
                     {saving ? "Saving..." : "Save Changes"}
                   </Button>
-
                 </Form>
               </Card.Body>
             </Card>

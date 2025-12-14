@@ -137,9 +137,7 @@ export default function PostTemplate({ post }) {
     ? new Date(createdAt * 1000).toLocaleDateString()
     : "";
 
-  /* -----------------------------
-     RENDER
-  ----------------------------- */
+  
   return (
     <>
       <div

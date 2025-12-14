@@ -1,38 +1,61 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
+import { doc, onSnapshot } from "firebase/firestore";
 import Autocomplete from "./AutoComplete";
-const suggestions = ["Plastic Bottles", "Paper", "Plastic", "Plastic Bottles", "Soda Cans", "Platic Bags", "Tubs", "Jugs", "Aluminum Cans", "Steel Cans", "Containers", "Metal"];
 
-// Search bar
-function SearchBar({ onSearch }) {
-
-  return (
-    <input
-      type="text"
-      placeholder="Search by text or tag..."
-      onChange={(e) => onSearch(e.target.value)}
-      style={{
-        width: "500px",
-        padding: "8px 12px",
-        borderRadius: "6px",
-        border: "1px solid #aaa",
-        marginLeft: "20px",
-      }}
-    />
-  );
-}
+const suggestions = [
+  "Plastic Bottles",
+  "Paper",
+  "Plastic",
+  "Plastic Bottles",
+  "Soda Cans",
+  "Platic Bags",
+  "Tubs",
+  "Jugs",
+  "Aluminum Cans",
+  "Steel Cans",
+  "Containers",
+  "Metal",
+];
 
 function NavBar({ onSearch }) {
   const [open, setOpen] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState("");
   const navigate = useNavigate();
 
-  const user = auth.currentUser;
+  useEffect(() => {
+    let unsubscribeUser = null;
+
+    const unsubscribeAuth = auth.onAuthStateChanged((user) => {
+      // Clear avatar on logout
+      if (!user) {
+        setAvatarUrl("");
+        if (unsubscribeUser) unsubscribeUser();
+        return;
+      }
+
+      // LIVE Firestore listener (FIX)
+      const userRef = doc(db, "users", user.uid);
+      unsubscribeUser = onSnapshot(userRef, (snap) => {
+        if (snap.exists()) {
+          setAvatarUrl(snap.data().avatarUrl || "");
+        } else {
+          setAvatarUrl("");
+        }
+      });
+    });
+
+    return () => {
+      unsubscribeAuth();
+      if (unsubscribeUser) unsubscribeUser();
+    };
+  }, []);
 
   const handleLogout = async () => {
-    await auth.signOut();
-    window.location.reload();
+  await auth.signOut();
+  navigate("/");
   };
 
   return (
@@ -44,45 +67,22 @@ function NavBar({ onSearch }) {
         top: 0,
         width: "100%",
         height: "60px",
-        display: "flex",
-        alignItems: "center",
-        overflow: "visible",
-        zIndex: 3000
+        zIndex: 3000,
       }}
     >
-      <Link
-        to="/"
-        className="navbar-brand fw-bold text-dark"
-        style={{ fontSize: "1.4rem" }}
-      >
+      <Link to="/" className="navbar-brand fw-bold text-dark">
         ReCraft
       </Link>
 
-     <div style={{ marginLeft: "20px", width: "500px" }}>
-        <Autocomplete
-          suggestions={suggestions}
-          onSearch={onSearch}
-          placeholder="Search by text or tag..."
-          style={{
-            width: "100%",
-            padding: "8px 12px",
-            borderRadius: "6px",
-            border: "1px solid #aaa",
-          }}
-        />
+      <div style={{ marginLeft: "20px", width: "500px" }}>
+        <Autocomplete suggestions={suggestions} onSearch={onSearch} />
       </div>
 
       <div className="ms-auto me-3">
-        <Link
-          to="/"
-          className="text-dark fw-semibold me-3 text-decoration-none"
-        >
+        <Link to="/" className="text-dark fw-semibold me-3 text-decoration-none">
           Home
         </Link>
-        <Link
-          to="/about"
-          className="text-dark fw-semibold text-decoration-none"
-        >
+        <Link to="/about" className="text-dark fw-semibold text-decoration-none">
           About
         </Link>
       </div>
@@ -93,12 +93,25 @@ function NavBar({ onSearch }) {
           onClick={() => setOpen(!open)}
           style={{
             cursor: "pointer",
-            padding: "6px 10px",
+            padding: "6px",
             borderRadius: "50%",
             backgroundColor: "#eee",
           }}
         >
-          <i className="bi bi-person-fill" style={{ fontSize: "1.5rem" }}></i>
+          {avatarUrl ? (
+            <img
+              src={avatarUrl}
+              alt="profile"
+              style={{
+                width: "32px",
+                height: "32px",
+                borderRadius: "50%",
+                objectFit: "cover",
+              }}
+            />
+          ) : (
+            <i className="bi bi-person-fill" style={{ fontSize: "1.5rem" }} />
+          )}
         </div>
 
         {open && (
@@ -112,25 +125,15 @@ function NavBar({ onSearch }) {
               borderRadius: "6px",
               padding: "10px",
               width: "150px",
-
-              /** ⭐ FIX 3 — ensure Settings is visible */
-              zIndex: 5000
+              zIndex: 5000,
             }}
           >
-            {!user ? (
+            {!auth.currentUser ? (
               <>
-                <p
-                  className="dropdown-item"
-                  style={{ cursor: "pointer" }}
-                  onClick={() => navigate("/login")}
-                >
+                <p className="dropdown-item" onClick={() => navigate("/login")}>
                   Login
                 </p>
-                <p
-                  className="dropdown-item"
-                  style={{ cursor: "pointer" }}
-                  onClick={() => navigate("/signup")}
-                >
+                <p className="dropdown-item" onClick={() => navigate("/signup")}>
                   Sign Up
                 </p>
               </>
@@ -138,24 +141,20 @@ function NavBar({ onSearch }) {
               <>
                 <p
                   className="dropdown-item"
-                  style={{ cursor: "pointer" }}
-                  onClick={() => navigate(`/profile/${user.uid}`)}
+                  onClick={() =>
+                    navigate(`/profile/${auth.currentUser.uid}`)
+                  }
                 >
                   My Profile
                 </p>
-
-                {/** ⭐ ADDED — this was missing! */}
                 <p
                   className="dropdown-item"
-                  style={{ cursor: "pointer" }}
                   onClick={() => navigate("/settings")}
                 >
                   Settings
                 </p>
-
                 <p
                   className="dropdown-item text-danger"
-                  style={{ cursor: "pointer" }}
                   onClick={handleLogout}
                 >
                   Logout
