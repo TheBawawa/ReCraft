@@ -48,7 +48,7 @@ Our app facilitates and enhances the search for DIY (Do it yourself) projects. I
 
 * [Sprint planning](https://docs.google.com/spreadsheets/d/1rRPT84waIOKSS-jNs7svqoX1Bdp5Rm51gihuctjPzRk/edit?gid=392672048#gid=392672048)
 * [Scrums](https://docs.google.com/document/d/1tpGb5-cIzuRoG6078RsbcmG2fu5dt1ofmsENnRTBLBo/edit?tab=t.h2i99v7d05ix)
-* [Sprint demo video]()
+* [Sprint demo video](https://nam12.safelinks.protection.outlook.com/?url=https%3A%2F%2Fpace.zoom.us%2Frec%2Fshare%2FFhgJCTOR5p4Zh9OzmYqTMoDsU-21IIYOGxV2wFM_oN-5OR-KnKCr7ZrB023jzMO9.CKZOYU-ts64tq1Hs&data=05%7C02%7Cjw03798n%40pace.edu%7Ce0b4b9698a374c5cb41308de3bf1c845%7C0799c53eca9a49e88901064a6412a41d%7C0%7C0%7C639014106797967375%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=QYViCE3IHZwHBLIqxwNVHM%2FAqsp8k1wVbiualb%2B9KVA%3D&reserved=0)
 * [Sprint retrospective](https://docs.google.com/document/d/1HTuQpgAUotaau_h_E9dzIQImgwNS7a9n72Ex2O3S9Dw/edit?usp=sharing)
 
 ## Tools & APIs
