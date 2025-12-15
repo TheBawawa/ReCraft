@@ -156,12 +156,11 @@ export default function PostTemplate({ post }) {
         {mediaData && (
           mediaType === "video/link" ? (
             <iframe
-            id="MM-Img"
               width="100%"
               height="200px"
               src={getYouTubeEmbedUrl(mediaData)}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              style={{ borderRadius: "12px" }}
+              style={{ borderRadius: "12px", objectFit: "cover" }}
               allowFullScreen
               title="video"
             />
@@ -169,13 +168,13 @@ export default function PostTemplate({ post }) {
             <video
               src={mediaData}
               controls
-              style={{ width: "100%", maxHeight: "200px", borderRadius: "12px" }}
+              style={{ width: "100%", maxHeight: "100%", borderRadius: "12px" }}
             />
           ) : (
             <img
               src={mediaData}
               alt="post"
-              style={{width: "100%", maxHeight: "200px", borderRadius: "12px", objectFit: "cover",}}
+              style={{width: "100%", height: "200px", borderRadius: "12px", objectFit: "cover",}}
            />
           )
         )}

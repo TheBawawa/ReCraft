@@ -23,7 +23,7 @@ export default function EditPost() {
 
   const availableTags = ["Plastic", "Paper", "Glass", "Metal", "Fabric"];
 
-  // Fetch post if not passed via state
+  
   useEffect(() => {
     const fetchPost = async () => {
       if (!passedPost) {
@@ -35,7 +35,7 @@ export default function EditPost() {
     fetchPost();
   }, [id, passedPost]);
 
-  // Initialize form values
+  
   useEffect(() => {
     if (post) {
       setEditedText(post.text || "");
@@ -59,7 +59,7 @@ export default function EditPost() {
     );
   };
 
-  // Convert file to base64
+  
   const fileToBase64 = (file) =>
     new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -68,17 +68,19 @@ export default function EditPost() {
       reader.onerror = (err) => reject(err);
     });
 
+  
   const handleSubmit = async () => {
-    if (!editedText && !editedImageFile && !editedVideoLink && !editedCaption) {
+    if (!editedText && !editedCaption && !editedImageFile && !editedVideoLink) {
       alert("Please add text, image, or video!");
       return;
     }
 
-    let mediaData = null;
-    let mediaType = null;
+    
+    let mediaData = post.mediaData;
+    let mediaType = post.mediaType;
 
+    
     if (editedImageFile) {
-      // Limit size to 800 KB
       const maxSize = 800 * 1024;
       if (editedImageFile.size > maxSize) {
         alert("Image too large! Max 800KB.");
@@ -102,7 +104,7 @@ export default function EditPost() {
       });
 
       alert("Post updated successfully!");
-      navigate("/"); // go back home
+      navigate("/");
     } catch (err) {
       console.error(err);
       alert("Failed to update post.");
@@ -115,13 +117,31 @@ export default function EditPost() {
         minHeight: "100vh",
         background: "linear-gradient(135deg, #89d957 0%, #1b9aaa 100%)",
         padding: "40px 0",
-        paddingTop:"10%"
+        paddingTop: "10%",
       }}
     >
       <Container>
         <Card className="shadow-lg border-0 rounded-4 p-4">
           <h2 className="fw-bold mb-4 text-center">Edit Post</h2>
+
           <Form>
+            {/* -------- CURRENT IMAGE PREVIEW -------- */}
+            {post.mediaData &&
+              post.mediaType?.startsWith("image/") &&
+              !editedImageFile && (
+                <img
+                  src={post.mediaData}
+                  alt="Current"
+                  className="mb-3"
+                  style={{
+                    width: "100%",
+                    maxHeight: "200px",
+                    objectFit: "cover",
+                    borderRadius: "12px",
+                  }}
+                />
+              )}
+
             <Form.Group className="mb-3">
               <Form.Label>Upload Image</Form.Label>
               <Form.Control
@@ -129,13 +149,10 @@ export default function EditPost() {
                 accept="image/*"
                 onChange={(e) => setEditedImageFile(e.target.files[0])}
               />
-              {editedImageFile && (
-                <small>Selected: {editedImageFile.name}</small>
-              )}
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Or Link a Video (YouTube, etc.)</Form.Label>
+              <Form.Label>Or Link a Video</Form.Label>
               <Form.Control
                 type="text"
                 placeholder="https://www.youtube.com/watch?v=..."
@@ -145,23 +162,21 @@ export default function EditPost() {
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Post Title:</Form.Label>
+              <Form.Label>Post Title</Form.Label>
               <Form.Control
                 type="text"
                 value={editedText}
                 onChange={(e) => setEditedText(e.target.value)}
-                placeholder="Type your post title here..."
               />
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Post Caption:</Form.Label>
+              <Form.Label>Post Caption</Form.Label>
               <Form.Control
                 as="textarea"
                 rows={4}
                 value={editedCaption}
                 onChange={(e) => setEditedCaption(e.target.value)}
-                placeholder="Type your post caption here..."
               />
             </Form.Group>
 
@@ -169,9 +184,13 @@ export default function EditPost() {
               <Form.Label>Tags</Form.Label>
               <Row>
                 {availableTags.map((tag) => (
-                  <Col xs="auto" key={tag} className="mb-2">
+                  <Col xs="auto" key={tag}>
                     <Button
-                      variant={editedTags.includes(tag) ? "primary" : "outline-secondary"}
+                      variant={
+                        editedTags.includes(tag)
+                          ? "primary"
+                          : "outline-secondary"
+                      }
                       onClick={() => handleTagToggle(tag)}
                     >
                       {tag}
