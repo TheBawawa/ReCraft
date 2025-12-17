@@ -52,7 +52,7 @@ Our app facilitates and enhances the search for DIY (Do it yourself) projects. I
 * [Sprint retrospective](https://docs.google.com/document/d/1HTuQpgAUotaau_h_E9dzIQImgwNS7a9n72Ex2O3S9Dw/edit?usp=sharing)
 
 ## Tools & APIs
-![toolsandapi image](Screenshot 2025-12-17 at 3.18.22 PM)
+![toolsandapi image](Screenshot 2025-12-17 at 3.18.22 PM.png)
 ## Final delivery
 
 * [Final presentation](https://docs.google.com/presentation/d/12cRNcmVsVm96lepGl4YAo3FFz-DINR1plF2MJUHeAvE/edit?slide=id.g391c7c2e1f6_2_331#slide=id.g391c7c2e1f6_2_331)
