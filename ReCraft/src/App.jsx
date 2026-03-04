@@ -22,7 +22,7 @@ function App() {
       <Navbar onSearch={setSearchTerm} />
 
       <Routes>
-        <Route path="/" element={<Home searchTerm={searchTerm} />} />
+        <Route path="/" element={<Home searchText={searchTerm} />} />
         <Route path="/about" element={<About />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/signup" element={<SignupForm />} />

@@ -5,13 +5,13 @@ import { getStorage } from "firebase/storage";
 
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAfsaDKZ2XUkzEcxTq5GUr63uBhW9ID_FQ",
-  authDomain: "recraft-e1506.firebaseapp.com",
-  projectId: "recraft-e1506",
-  storageBucket: "recraft-e1506.firebasestorage.app",
-  messagingSenderId: "760809442713",
-  appId: "1:760809442713:web:412980f4cfb619e335d708",
-  measurementId: "G-K8449WJ1DV"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 

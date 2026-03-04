@@ -221,7 +221,7 @@ export default function PostTemplate({ post }) {
 
       {/* MODAL */}
       <Modal show={show} onHide={() => setShow(false)} size="xl" centered style={ {marginTop: "4%",}}>
-        <div style={{marginLeft: "auto", marginLeft: "90%", width: "100%"}}>
+        <div style={{marginLeft: "90%", width: "100%"}}>
           <ButtonGroup>
           {isOwner && (
             <Button style={{ marginTop: "5%", width: "100%"}}
